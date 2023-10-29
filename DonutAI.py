@@ -432,7 +432,7 @@ elif assistanttype == "2":
             # print(e)    
             print("Say that again please...")
             speak('I didnt hear anything, if you said anything please speak loud and clear')
-            return "None"
+            return ""
         return query
 
     def sendEmail(to, content):
