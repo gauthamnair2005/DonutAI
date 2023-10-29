@@ -20,7 +20,6 @@ print("Gautham Nair")
 print("More AI Features Coming Soon")
 
 assistanttype = input("Please Select any one: \n \t 1.DonutAI Mike \n \t 2.DonutAI Annie \n > ")
-default_engine = input("Select a default search engine: \n \t 1. Google \n \t 2. Bing \n > ")
 if assistanttype == "1":
     engine = pyttsx3.init('sapi5')
     voices = engine.getProperty('voices')
@@ -93,6 +92,7 @@ if assistanttype == "1":
                 speak('Searching Wikipedia...')
                 query = query.replace("wikipedia", "")
                 results = wikipedia.summary(query, sentences=2)
+                print("Generating Answers..!")
                 speak("According to Wikipedia")
                 print(results)
                 speak(results)
@@ -103,10 +103,10 @@ if assistanttype == "1":
                 speak(My_joke)
 
             elif 'search' in query:
-                speak('Searching '+ default_engine)
-                query = query.replace(default_engine, "")
-                results = wikipedia.summary(query, sentences=2)
-                speak("According to " + default_engine)
+                speak('Searching the web')
+                results = wikipedia.summary(query, sentences=10)
+                print("Generating Answers..!")
+                speak("According to Online Sources")
                 print(results)
                 speak(results)
 
@@ -119,38 +119,6 @@ if assistanttype == "1":
                 answer = next(res.results).text
                 speak(answer)
                 print(answer)
-
-            elif 'weather' in query:
-                from bs4 import BeautifulSoup
-                import requests
-                headers = {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-
-
-                def weather(city):
-                        city = city.replace(" ", "+")
-                        res = requests.get(
-                                f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8', headers=headers)
-                        print("Searching...\n")
-                        soup = BeautifulSoup(res.text, 'html.parser')
-                        location = soup.select('#wob_loc')[0].getText().strip()
-                        time = soup.select('#wob_dts')[0].getText().strip()
-                        info = soup.select('#wob_dc')[0].getText().strip()
-                        weather = soup.select('#wob_tm')[0].getText().strip()
-                        print(location)
-                        speak(location)
-                        print(time)
-                        speak(time)
-                        print(info)
-                        speak(info)
-                        print(weather+"°C")
-                        speak(weather+"°C")
-
-
-                city = input("Enter the Name of City -> ")
-                city = city+" weather"
-                weather(city)
-                print("Have a Nice Day:)")
 
             elif "calculate" in query:
 
@@ -466,10 +434,10 @@ elif assistanttype == "2":
                 speak(My_joke)
 
             elif 'search' in query:
-                speak('Searching '+ default_engine)
-                query = query.replace(default_engine, "")
-                results = wikipedia.summary(query, sentences=2)
-                speak("According to " + default_engine)
+                speak('Searching the web')
+                results = wikipedia.summary(query, sentences=10)
+                print("Generating Answers..!")
+                speak("According to Online Sources")
                 print(results)
                 speak(results)
 
@@ -482,38 +450,6 @@ elif assistanttype == "2":
                 answer = next(res.results).text
                 speak(answer)
                 print(answer)
-
-            elif 'weather' in query:
-                from bs4 import BeautifulSoup
-                import requests
-                headers = {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-
-
-                def weather(city):
-                        city = city.replace(" ", "+")
-                        res = requests.get(
-                                f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8', headers=headers)
-                        print("Searching...\n")
-                        soup = BeautifulSoup(res.text, 'html.parser')
-                        location = soup.select('#wob_loc')[0].getText().strip()
-                        time = soup.select('#wob_dts')[0].getText().strip()
-                        info = soup.select('#wob_dc')[0].getText().strip()
-                        weather = soup.select('#wob_tm')[0].getText().strip()
-                        print(location)
-                        speak(location)
-                        print(time)
-                        speak(time)
-                        print(info)
-                        speak(info)
-                        print(weather+"°C")
-                        speak(weather+"°C")
-
-
-                city = input("Enter the Name of City -> ")
-                city = city+" weather"
-                weather(city)
-                print("Have a Nice Day:)")
 
             elif "calculate" in query:
 
