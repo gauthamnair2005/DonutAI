@@ -69,7 +69,7 @@ if assistanttype == "1":
             # print(e)    
             print("Say that again please...")
             speak('I didnt hear anything, if you said anything please speak loud and clear')
-            return "None"
+            return ""
         return query
 
     def sendEmail(to, content):
@@ -211,6 +211,14 @@ if assistanttype == "1":
                 speak('I made my debut on 1st March 2022')
 
             elif 'your developers name' in query:
+                print("Gautham Nair")
+                speak("Gautham Nair")
+            
+            elif 'who developed you' in query:
+                print("Gautham Nair")
+                speak("Gautham Nair")
+
+            elif 'what is your developers name' in query:
                 print("Gautham Nair")
                 speak("Gautham Nair")
 
@@ -363,14 +371,17 @@ if assistanttype == "1":
             
             else:
                 client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                res = client.query(query)
                 try:
-                    answer = next(res.results).text
-                    print(answer)
-                    speak(answer)
-                except StopIteration:
-                    print("Sorry, that's on me, I could'nt find any results.!")
-                    speak("Sorry, that's on me, I could'nt find any results.!")
+                    res = client.query(query)
+                    try:
+                        answer = next(res.results).text
+                        print(answer)
+                        speak(answer)
+                    except StopIteration:
+                        print("Sorry, that's on me, I couldn't find any results.!")
+                        speak("Sorry, that's on me, I couldn't find any results.!")
+                except Exception as e:
+                    print("")
 
     time.sleep(3)
 
@@ -565,6 +576,14 @@ elif assistanttype == "2":
             elif 'your developers name' in query:
                 print("Gautham Nair")
                 speak("Gautham Nair")
+            
+            elif 'who developed you' in query:
+                print("Gautham Nair")
+                speak("Gautham Nair")
+
+            elif 'what is your developers name' in query:
+                print("Gautham Nair")
+                speak("Gautham Nair")
 
             elif 'open code' in query:
                 codePath = "code"
@@ -716,13 +735,16 @@ elif assistanttype == "2":
 
             else:
                 client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                res = client.query(query)
                 try:
-                    answer = next(res.results).text
-                    print(answer)
-                    speak(answer)
-                except StopIteration:
-                    print("Sorry, that's on me, I could'nt find any results.!")
-                    speak("Sorry, that's on me, I could'nt find any results.!")
+                    res = client.query(query)
+                    try:
+                        answer = next(res.results).text
+                        print(answer)
+                        speak(answer)
+                    except StopIteration:
+                        print("Sorry, that's on me, I couldn't find any results.!")
+                        speak("Sorry, that's on me, I couldn't find any results.!")
+                except Exception as e:
+                    print("")
 
     time.sleep(3)
