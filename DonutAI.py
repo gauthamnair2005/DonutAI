@@ -11,8 +11,14 @@ import subprocess
 import pyjokes
 import time
 import requests
+import google.generativeai
+from langchain.embeddings import GooglePalmEmbeddings
+from langchain.llms import GooglePalm
 from bs4 import BeautifulSoup
 
+model_id="models/chat-bison-001"
+llm=GooglePalm(google_api_key="AIzaSyCQ0Ro5YqoawhDDK0yiiceAd0ljWrwa5pw")
+llm.temperature=0.7
 
 print("DonutAI PREVIEW")
 print("Built On Donut Assistant")
@@ -105,7 +111,6 @@ if assistanttype == "1":
             elif 'search' in query:
                 speak('Searching the web')
                 results = wikipedia.summary(query, sentences=10)
-                print("Generating Answers..!")
                 speak("According to Online Sources")
                 print(results)
                 speak(results)
@@ -338,18 +343,18 @@ if assistanttype == "1":
                 subprocess.call(["shutdown", "/l"])
             
             else:
-                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                try:
-                    res = client.query(query)
+                if query == "":
+                    print()
+                else:
                     try:
-                        answer = next(res.results).text
-                        print(answer)
-                        speak(answer)
-                    except StopIteration:
-                        print("Sorry, that's on me, I couldn't find any results.!")
-                        speak("Sorry, that's on me, I couldn't find any results.!")
-                except Exception as e:
-                    print("")
+                        prompt = [query]
+                        llm_results= llm._generate(prompt)
+                        res=llm_results.generations
+                        print(res[0][0].text)
+                        speak(res[0][0].text)
+                    except Exception as e:
+                        print(e)
+                        speak("Sorry, I could not generate an answer for that.!")
 
     time.sleep(3)
 
@@ -670,17 +675,17 @@ elif assistanttype == "2":
                 subprocess.call(["shutdown", "/l"])
 
             else:
-                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                try:
-                    res = client.query(query)
+                if query == "":
+                    print()
+                else:
                     try:
-                        answer = next(res.results).text
-                        print(answer)
-                        speak(answer)
-                    except StopIteration:
-                        print("Sorry, that's on me, I couldn't find any results.!")
-                        speak("Sorry, that's on me, I couldn't find any results.!")
-                except Exception as e:
-                    print("")
+                        prompt = [query]
+                        llm_results= llm._generate(prompt)
+                        res=llm_results.generations
+                        print(res[0][0].text)
+                        speak(res[0][0].text)
+                    except Exception as e:
+                        print(e)
+                        speak("Sorry, I could not generate an answer for that.!")
 
     time.sleep(3)
