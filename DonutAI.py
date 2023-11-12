@@ -10,7 +10,6 @@ import wolframalpha
 import subprocess
 import pyjokes
 import time
-import requests
 import google.generativeai
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.llms import GooglePalm
