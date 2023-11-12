@@ -68,7 +68,6 @@ if assistanttype == "1":
             print("Recognizing...")    
             query = r.recognize_google(audio, language='en-in')
             print(f"User said: {query}\n")
-            print("Generating Answers.!")
 
         except Exception as e:
             # print(e)    
@@ -83,9 +82,15 @@ if assistanttype == "1":
         server.starttls()
         email = input("Enter your gmail username: ")
         psswrd = input("Enter yourn gmail password: ")
-        server.login(email, psswrd)
-        server.sendmail(email, to, content)
-        server.close()
+        try:
+            server.login(email, psswrd)
+            server.sendmail(email, to, content)
+            server.close()
+            print("E-mail kas been sent")
+            speak("E-Mail has been sent")
+        except Exception as e:
+            print("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
+            speak("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
 
     if __name__ == "__main__":
         wishMe()
@@ -108,16 +113,9 @@ if assistanttype == "1":
                 print(My_joke)
                 speak(My_joke)
 
-            elif 'search' in query:
-                speak('Searching the web')
-                results = wikipedia.summary(query, sentences=10)
-                speak("According to Online Sources")
-                print(results)
-                speak(results)
-
 
             elif 'question' in query:
-                speak('I can answer to computational and geographical questions  and what question do you want to ask now')
+                speak('I can answer to computational and geographical questions, what question do you want to ask now')
                 question=takeCommand()
                 client = wolframalpha.Client('UL8UPY-4EHX5683WH')
                 res = client.query(question)
@@ -141,7 +139,11 @@ if assistanttype == "1":
                 webbrowser.open("youtube.com")
 
             elif 'open browser' in query:
-                webbrowser.open("bing.com" or "google.com")
+                webbrowser.open("google.com")
+
+            elif 'open google' in query or 'open Google' in query:
+                speak('Opening Google in your default browser')
+                webbrowser.open("google.com")
 
             elif 'open bing' in query:
                 speak('Opening bing in your default browser')
@@ -151,11 +153,7 @@ if assistanttype == "1":
                 speak('This will open Donut Support Website in your default browser, you can give feedback there!')
                 webbrowser.open("Donutsupport.simdif.com")
 
-            elif 'open google' in query:
-                speak('Opening google in your default browser')
-                webbrowser.open("google.com")
-
-            elif 'open stackoverflow' in query:
+            elif 'open stackoverflow' in query or 'open stack overflow' in query:
                 speak('Opening StackOverflow in your default browser')
                 webbrowser.open("stackoverflow.com")   
 
@@ -333,7 +331,6 @@ if assistanttype == "1":
                     content = takeCommand()
                     to = useria    
                     sendEmail(to, content)
-                    speak("Email has been sent!")
                 except Exception as e:
                     print(e)
                     speak("Sorry my friend. I am not able to send this email")
@@ -350,6 +347,8 @@ if assistanttype == "1":
                         prompt = [query]
                         llm_results= llm._generate(prompt)
                         res=llm_results.generations
+                        print("Generating Answers...!")
+                        print()
                         print(res[0][0].text)
                         speak(res[0][0].text)
                     except Exception as e:
@@ -414,9 +413,13 @@ elif assistanttype == "2":
         server.starttls()
         email = input("Enter your gmail username: ")
         psswrd = input("Enter yourn gmail password: ")
-        server.login(email, psswrd)
-        server.sendmail(email, to, content)
-        server.close()
+        try:
+            server.login(email, psswrd)
+            server.sendmail(email, to, content)
+            server.close()
+        except Exception as e:
+            print("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
+            speak("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
 
     if __name__ == "__main__":
         wishMe()
@@ -437,14 +440,6 @@ elif assistanttype == "2":
                 My_joke = pyjokes.get_joke(language="en", category="neutral")
                 print(My_joke)
                 speak(My_joke)
-
-            elif 'search' in query:
-                speak('Searching the web')
-                results = wikipedia.summary(query, sentences=10)
-                print("Generating Answers..!")
-                speak("According to Online Sources")
-                print(results)
-                speak(results)
 
 
             elif 'question' in query:
@@ -472,7 +467,7 @@ elif assistanttype == "2":
                 webbrowser.open("youtube.com")
 
             elif 'open browser' in query:
-                webbrowser.open("bing.com" or "google.com")
+                webbrowser.open("google.com")
 
             elif 'open bing' in query:
                 speak('Opening bing in your default browser')
@@ -482,11 +477,11 @@ elif assistanttype == "2":
                 speak('This will open Donut Support Website in your default browser, you can give feedback there!')
                 webbrowser.open("Donutsupport.simdif.com")
 
-            elif 'open google' in query:
+            elif 'open google' in query or 'open Google' in query:
                 speak('Opening google in your default browser')
                 webbrowser.open("google.com")
 
-            elif 'open stackoverflow' in query:
+            elif 'open stackoverflow' in query or 'open stack overflow' in query:
                 speak('Opening StackOverflow in your default browser')
                 webbrowser.open("stackoverflow.com")   
 
@@ -665,7 +660,6 @@ elif assistanttype == "2":
                     content = takeCommand()
                     to = useria    
                     sendEmail(to, content)
-                    speak("Email has been sent!")
                 except Exception as e:
                     print(e)
                     speak("Sorry my friend. I am not able to send this email")
@@ -682,6 +676,8 @@ elif assistanttype == "2":
                         prompt = [query]
                         llm_results= llm._generate(prompt)
                         res=llm_results.generations
+                        print("Generating Answers..!")
+                        print()
                         print(res[0][0].text)
                         speak(res[0][0].text)
                     except Exception as e:
