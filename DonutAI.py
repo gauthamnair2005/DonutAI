@@ -374,7 +374,7 @@ if assistanttype['assistant_type'] == "Mike":
 
     time.sleep(3)
 
-elif assistanttype == "Annie":
+elif assistanttype['assistant_type'] == "Annie":
     engine = pyttsx3.init()
     engine.setProperty('rate',150)
     voices = engine.getProperty('voices')
