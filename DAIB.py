@@ -83,6 +83,8 @@ def send():
 		txt.insert(END, "\n" + "DonutAI : " + res_str + "\n")
 		t = threading.Thread(target=speak, args=(res_str,))
 		t.start()
+	elif (user == "" or user == " "):
+		pass
 	elif (user == "goodbye" or user == "see you later" or user == "see yaa"):
 		txt.insert(END, "\n" + "DonutAI : Have a nice day!" + "\n")
 		root.quit()
