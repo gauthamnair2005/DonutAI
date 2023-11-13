@@ -19,14 +19,15 @@ model_id="models/chat-bison-001"
 llm=GooglePalm(google_api_key="AIzaSyCQ0Ro5YqoawhDDK0yiiceAd0ljWrwa5pw")
 llm.temperature=0.7
 
-print("DonutAI PREVIEW")
+print("DonutAI PREVIEW v2")
 print("Built On Donut Assistant")
 print("Gautham Nair")
 print("More AI Features Coming Soon")
 
 assistanttype = input("Please Select any one: \n \t 1.DonutAI Mike \n \t 2.DonutAI Annie \n > ")
 if assistanttype == "1":
-    engine = pyttsx3.init('sapi5')
+    engine = pyttsx3.init()
+    engine.setProperty('rate',150)
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[0].id)
 
@@ -357,7 +358,8 @@ if assistanttype == "1":
     time.sleep(3)
 
 elif assistanttype == "2":
-    engine = pyttsx3.init('sapi5')
+    engine = pyttsx3.init()
+    engine.setProperty('rate',150)
     voices = engine.getProperty('voices')
     engine.setProperty('voice', voices[1].id)
 
