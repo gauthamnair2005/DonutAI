@@ -5,5 +5,5 @@ setup(
     name = "DonutAI",
     version = "1.0",
     description = "DonutAI Assistant",
-    executables = [Executable("DonutAI.py", base = "Win32GUI")]
+    executables = [Executable("DAIB.py", base = "Win32GUI")]
 )
