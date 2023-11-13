@@ -15,6 +15,7 @@ from langchain.embeddings import GooglePalmEmbeddings
 from langchain.llms import GooglePalm
 from bs4 import BeautifulSoup
 from PyInquirer import Separator, prompt
+import markdown
 
 questions = [
     {
