@@ -14,7 +14,24 @@ import google.generativeai
 from langchain.embeddings import GooglePalmEmbeddings
 from langchain.llms import GooglePalm
 from bs4 import BeautifulSoup
+from PyInquirer import Separator, prompt
 
+questions = [
+    {
+        'type': 'list',
+        'name': 'assistant_type',
+        'message': 'Select an assistant type:',
+        'choices': [
+            'Mike',
+            'Annie',
+            Separator(),
+            {
+                'name': 'Exit',
+                'value': 'exit'
+            }
+        ]
+    }
+]
 model_id="models/chat-bison-001"
 llm=GooglePalm(google_api_key="AIzaSyCQ0Ro5YqoawhDDK0yiiceAd0ljWrwa5pw")
 llm.temperature=0.7
@@ -24,8 +41,8 @@ print("Built On Donut Assistant")
 print("Gautham Nair")
 print("More AI Features Coming Soon")
 
-assistanttype = input("Please Select any one: \n \t 1.DonutAI Mike \n \t 2.DonutAI Annie \n > ")
-if assistanttype == "1":
+assistanttype = prompt(questions)
+if assistanttype['assistant_type'] == "Mike":
     engine = pyttsx3.init()
     engine.setProperty('rate',150)
     voices = engine.getProperty('voices')
@@ -357,7 +374,7 @@ if assistanttype == "1":
 
     time.sleep(3)
 
-elif assistanttype == "2":
+elif assistanttype == "Annie":
     engine = pyttsx3.init()
     engine.setProperty('rate',150)
     voices = engine.getProperty('voices')
@@ -684,5 +701,7 @@ elif assistanttype == "2":
                     except Exception as e:
                         print(e)
                         speak("Sorry, I could not generate an answer for that.!")
+else:
+    print("Exiting.!")
 
     time.sleep(3)
