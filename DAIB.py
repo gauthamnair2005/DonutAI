@@ -31,7 +31,7 @@ FONT = "Roboto 14"
 FONT_BOLD = "Roboto 13 bold"
 
 model_id="models/chat-bison-001"
-llm=GooglePalm(google_api_key="AIzaSyCQ0Ro5YqoawhDDK0yiiceAd0ljWrwa5pw")
+llm=GooglePalm(google_api_key="API")
 llm.temperature=0.7
 
 engine = pyttsx3.init()
