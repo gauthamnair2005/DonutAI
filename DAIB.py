@@ -137,14 +137,38 @@ class ChatbotGUI(QWidget):
                 audio = r.listen(source)
             try:
                 msg = r.recognize_google(audio)
-                self.chat_history.setStyleSheet("font-size: 20px; color: darkblue; background-color: lightblue;")
-                self.chat_history.append("You : ")
-                self.chat_history.append(msg)
-                self.chat_history.append("")
-                self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
-                self.chat_history.append("Generating Answers..!")
-                self.chat_history.append("")
-                threading.Thread(target=self.generate_response, args=(msg,)).start()
+                if msg == "":
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
+                    self.chat_history.append("DonutAI : Prompt cannot be empty.")
+                    self.chat_history.append("")
+                    return
+                elif msg == "exit":
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
+                    self.chat_history.append("DonutAI : Bye! You can press the 'X' or close button to close the window.")
+                    self.chat_history.append("")
+                    self.message_entry.clear()
+                    threading.Thread(target=self.speak, args=("Bye! You can press the 'X' or colese button to close the window.",)).start()
+                elif msg in donutai_keywords:
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
+                    self.chat_history.append("DonutAI : Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.")
+                    self.chat_history.append("")
+                    self.message_entry.clear()
+                    threading.Thread(target=self.speak, args=("Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.",)).start()
+                elif msg in developer_keywords:
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
+                    self.chat_history.append("DonutAI : I was developed by Gautham Nair.")
+                    self.chat_history.append("")
+                    self.message_entry.clear()
+                    threading.Thread(target=self.speak, args=("I was developed by Gautham Nair.",)).start()
+                else:
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkblue; background-color: lightblue;")
+                    self.chat_history.append("You : ")
+                    self.chat_history.append(msg)
+                    self.chat_history.append("")
+                    self.chat_history.setStyleSheet("font-size: 20px; color: darkviolet; background-color: lightblue;")
+                    self.chat_history.append("Generating Answers..!")
+                    self.chat_history.append("")
+                    threading.Thread(target=self.generate_response, args=(msg,)).start()
             except sr.UnknownValueError:
                 threading.Thread(target=self.speak, args=("Sorry, I couldn't understand, or didnt hear what you said. Please try again!",)).start()
                 return ""
