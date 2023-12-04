@@ -9,6 +9,7 @@ from PyQt5.QtCore import Qt, QSize
 from langchain.llms import GooglePalm
 import html
 import time
+import wolframalpha
 
 donutai_keywords = ["DonutAI", "donutai", "Donutai", "donutAI", "Donut AI", "donut ai", "donutAi", "donut AI"]
 developer_keywords = ["who developed you", "who developed you?", "who created you", "who created you?", "who made you", "who made you?", "who is your developer", "who is your developer?", "who is your creator", "who is your creator?", "who is your father", "who is your father?", "who is your dad", "who is your dad?", "who is your daddy", "who is your daddy?", "Who developed you", "Who developed you?", "Who created you", "Who created you?", "Who made you", "Who made you?", "Who is your developer", "Who is your developer?", "Who is your creator", "Who is your creator?", "Who is your father", "Who is your father?", "Who is your dad", "Who is your dad?", "Who is your daddy", "Who is your daddy?"]
@@ -135,6 +136,14 @@ class ChatbotGUI(QWidget):
                     self.chat_history.append("")
                     self.message_entry.clear()
                     return
+                elif 'weather' in msg:
+                    self.chat_history.append("<p style='color:darkviolet;'>DonutAI : </p>")
+                    self.chat_history.append("<p style='color:darkviolet;'>"+msg+"</p>")
+                    self.chat_history.append("")
+                    self.chat_history.append("<p style='color:green;'>Generating Answers..!</p>")
+                    self.chat_history.append("")
+                    self.message_entry.clear()
+                    threading.Thread(target=self.wolf, args=(msg,)).start()
                 elif msg == "exit":
                     self.chat_history.append("<p style='color:orange;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>")
                     self.chat_history.append("")
@@ -195,10 +204,22 @@ class ChatbotGUI(QWidget):
             engine.say(response_text)
             engine.runAndWait()
         else:
-            # Handle the case where response is empty or doesn't contain the expected structure
-            # You can customize this part according to your needs
-            self.chat_history.append("<p style='color:orange;'>DonutAI : I'm sorry, I couldn't generate a response.</p>")
-            self.message_entry.clear()
+            try:
+                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
+                res = client.query(msg)
+                response = next(res.results).text
+            except:
+                self.chat_history.append("<p style='color:orange;'>DonutAI : </p>")
+                self.chat_history.append("<p style='color:orange;'>Could not give response </p>")
+                self.chat_history.append("")
+                self.message_entry.clear()
+
+        
+    def wolf(self, msg):
+        client = wolframalpha.Client('UL8UPY-4EHX5683WH')
+        res = client.query(msg)
+        response = next(res.results).text
+        return response
 
 app = QApplication(sys.argv)
 window = ChatbotGUI()
