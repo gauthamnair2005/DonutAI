@@ -18,9 +18,8 @@ donutai_keywords = ["DonutAI", "donutai", "Donutai", "donutAI", "Donut AI", "don
 developer_keywords = ["who developed you", "who developed you?", "who created you", "who created you?", "who made you", "who made you?", "who is your developer", "who is your developer?", "who is your creator", "who is your creator?", "who is your father", "who is your father?", "who is your dad", "who is your dad?", "who is your daddy", "who is your daddy?", "Who developed you", "Who developed you?", "Who created you", "Who created you?", "Who made you", "Who made you?", "Who is your developer", "Who is your developer?", "Who is your creator", "Who is your creator?", "Who is your father", "Who is your father?", "Who is your dad", "Who is your dad?", "Who is your daddy", "Who is your daddy?"]
 
 key = input("Insert Google PaLM API Key: ")
-model_id="models/chat-bison-001"
 llm=GooglePalm(google_api_key=key)
-llm.temperature=0.7
+llm.temperature=1.0
 
 class ChatbotGUI(QWidget):
     def __init__(self):
