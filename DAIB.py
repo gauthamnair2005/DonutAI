@@ -4,7 +4,7 @@ import threading
 import markdown
 import speech_recognition as sr
 from PyQt5.QtWidgets import QApplication, QSizePolicy,QTextEdit,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QTextBrowser, QLabel
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
 from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl
@@ -34,6 +34,8 @@ class ChatbotGUI(QWidget):
                     body {
                         font-family: Arial;
                         font-size: 20px;
+                        color: orange;
+                        background-color: #F0F0F0;
                     }
                 </style>
             </head>
@@ -112,7 +114,7 @@ class ChatbotGUI(QWidget):
         
 
     def append_to_chat_history(self, text):
-        escaped_text = json.dumps(text)
+        escaped_text = json.dumps(QTextDocument(text).toPlainText())
         self.chat_history.page().runJavaScript("document.body.innerHTML += " + escaped_text + ";")
 
     def wolf(self, msg):
@@ -241,13 +243,13 @@ class ChatbotGUI(QWidget):
                 # Remove the backticks and wrap the response in a <pre> tag
                 response_text = '<pre>' + response_text[3:-3] + '</pre>'
                 self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>DonutAI : </p>")
-                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>"+response_text+"</p>")
+                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:#FFA500;'>"+response_text+"</p>")
                 self.append_to_chat_history("")
                 self.message_entry.clear()
             else:
                 response_text = response_text.replace('&quot;', '"')
                 self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>DonutAI : </p>")
-                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>"+response_text+"</p>")
+                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:#FFA500;'>"+response_text+"</p>")
                 self.append_to_chat_history("")
                 self.message_entry.clear()
 
@@ -259,7 +261,7 @@ class ChatbotGUI(QWidget):
                 res = client.query(msg)
                 response = next(res.results).text
                 self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>DonutAI : </p>")
-                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:orange;'>"+response+"</p>")
+                self.append_to_chat_history("<p style='font-family: arial; text-align:left;color:#FFA500;'>"+response+"</p>")
                 self.append_to_chat_history("")
                 self.message_entry.clear()
                 threading.Thread(target=self.speak, args=(response,)).start()
