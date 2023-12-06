@@ -46,10 +46,12 @@ class ChatbotGUI(QWidget):
         """)
 
         self.message_entry = QLineEdit()
-        self.send_button = QPushButton('Send')
-        self.send_button.setStyleSheet("QPushButton {background-color: lightgreen; border-radius: 30%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
-        self.voice_button = QPushButton('Voice')
-        self.voice_button.setStyleSheet("QPushButton {background-color: lightblue; border-radius: 30%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        self.send_button = QPushButton()
+        self.send_button.setIcon(QIcon('send.png'))
+        self.send_button.setStyleSheet("QPushButton {background-color: lightblue; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        self.voice_button = QPushButton()
+        self.voice_button.setIcon(QIcon('voice.png'))
+        self.voice_button.setStyleSheet("QPushButton {background-color: lightblue; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
         
         # Set window title and icon
         self.setWindowTitle('DonutAI PREVIEW')
@@ -78,7 +80,7 @@ class ChatbotGUI(QWidget):
 
         # Set styles
         self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: black;")
-        self.message_entry.setStyleSheet("font-size: 20px; color: darkviolet; background-color: white;")
+        self.message_entry.setStyleSheet("font-size: 20px; color: black; background-color: white;")
 
         self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -88,14 +90,13 @@ class ChatbotGUI(QWidget):
         self.message_entry.setFocus()
 
         # Decrease the size of the buttons and place them beside the prompt box
-        self.send_button.setFixedWidth(100)
-        self.voice_button.setFixedWidth(100)
+        self.send_button.setFixedWidth(50)
+        self.voice_button.setFixedWidth(50)
 
         button_layout = QHBoxLayout()
-        #button_layout.addWidget(self.voice_button)
         button_layout.addWidget(self.message_entry)
         button_layout.addWidget(self.send_button)
-        
+        button_layout.addWidget(self.voice_button)
 
         # Arrange widgets
         layout = QVBoxLayout()
