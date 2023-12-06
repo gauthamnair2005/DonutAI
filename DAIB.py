@@ -135,11 +135,6 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("")
             self.message_entry.clear()
 
-        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:orange;'>DonutAI : </p>")
-        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:orange;'>Welcome to <b>Donut</b>AI, this is in preview stage, so mistakes are expected..!</p>")
-        self.append_to_chat_history("")
-        self.message_entry.clear()
-
 
     def record_and_process(self):
         r = sr.Recognizer()
