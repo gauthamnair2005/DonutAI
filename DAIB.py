@@ -78,7 +78,7 @@ class ChatbotGUI(QWidget):
         self.voice_button.setFixedSize(60, 60)
 
         # Set styles
-        self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: black;")
+        self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: white;")
         self.message_entry.setStyleSheet("font-size: 20px; color: black; background-color: white;")
 
         self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
