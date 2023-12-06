@@ -9,7 +9,6 @@ from PyQt5.QtCore import Qt, QSize
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from PyQt5.QtCore import QUrl
 from langchain.llms import GooglePalm
-import html
 import time
 import wolframalpha
 import json
