@@ -126,6 +126,8 @@ class ChatbotGUI(QWidget):
             </body>
             </html>
         """)
+        
+
 
         self.message_entry = QLineEdit()
         self.send_button = QPushButton()
@@ -192,6 +194,10 @@ class ChatbotGUI(QWidget):
         self.send_button.clicked.connect(self.send)
         self.voice_button.clicked.connect(self.get_voice_input)
 
+    def scroll_to_bottom(self):
+        js_code = "window.scrollTo(0, document.body.scrollHeight);"
+        self.chat_history.page().runJavaScript(js_code)
+
     def speak(self, text):
         engine = pyttsx3.init()
         engine.say(text)
@@ -207,6 +213,7 @@ class ChatbotGUI(QWidget):
         else:
             escaped_text = json.dumps("<div class='genmessage'>" + plain_text + "</div><br>")
         self.chat_history.page().runJavaScript("document.body.innerHTML += " + escaped_text + ";")
+        self.scroll_to_bottom()
 
     def wolf(self, msg):
         try:
