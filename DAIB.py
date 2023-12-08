@@ -115,6 +115,33 @@ class ChatbotGUI(QWidget):
                         margin-top: -10px;
                         margin-left: -20px;
                     }
+                    .error {
+                        position: center;
+                        background: red;
+                        border-radius: 0.4em;
+                        color: black;
+                        padding: 10px;
+                        display: inline-block;
+                        margin: 10px;
+                        margin-bottom: 15px;
+                        float: left;
+                        clear: both;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
+                    }
+                    .error:after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-right-color: #f0f0f0;
+                        border-left: 0;
+                        border-right: 0;
+                        margin-top: -10px;
+                        margin-left: -20px;
+                    }
                     body {
                         font-family: Segoe UI;
                         font-size: 16px;
@@ -203,6 +230,8 @@ class ChatbotGUI(QWidget):
             escaped_text = json.dumps("<div class='user-bubble'>" + plain_text + "</div><br>")
         elif is_user_message == False:
             escaped_text = json.dumps("<div class='ai-bubble'>" + plain_text + "</div><br>")
+        elif is_user_message == "Error":
+            escaped_text = json.dumps("<div class='error'>" + plain_text + "</div><br>")
         else:
             escaped_text = json.dumps("<div class='genmessage'>" + plain_text + "</div><br>")
         self.chat_history.page().runJavaScript("document.body.innerHTML += " + escaped_text + ";")
@@ -219,7 +248,7 @@ class ChatbotGUI(QWidget):
             self.message_entry.clear()
         except:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
 
@@ -229,10 +258,11 @@ class ChatbotGUI(QWidget):
         with sr.Microphone() as source:
             audio = r.listen(source)
         try:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Recognizing..!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Recognizing..!</p>", "Random")
             msg = r.recognize_google(audio)
             if msg == "":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Prompt cannot be empty.</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Prompt cannot be empty.</p>", "Error")
                 self.append_to_chat_history("", False)
                 self.message_entry.clear()
                 return
@@ -312,14 +342,6 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-            elif msg in donutai_keywords:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.</p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
-            elif msg in developer_keywords:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : I was developed by Gautham Nair.</p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
             else:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
@@ -330,22 +352,23 @@ class ChatbotGUI(QWidget):
                 threading.Thread(target=self.generate_response, args=(msg,)).start()
         except sr.UnknownValueError:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
             return ""
         except sr.RequestError as e:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
             return ""
             
     def get_voice_input(self):
-        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Listening..!</p>", False)
+        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Listening..!</p>", "Random")
         self.append_to_chat_history("","Type")
         threading.Thread(target=self.record_and_process).start()
     
     def send(self):
         msg = self.message_entry.text()
         if msg == "":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Prompt cannot be empty.</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Prompt cannot be empty.</p>", "Error")
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             return
@@ -426,14 +449,6 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-        elif msg in donutai_keywords:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.</p>", False)
-            self.append_to_chat_history("","Type")
-            self.message_entry.clear()
-        elif msg in developer_keywords:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : I was developed by Gautham Nair.</p>", False)
-            self.append_to_chat_history("","Type")
-            self.message_entry.clear()
         else:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
@@ -446,7 +461,7 @@ class ChatbotGUI(QWidget):
     def generate_response(self, msg):
         if self.reply_mode == "False":
             try:
-                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair, which is better than Bard, ChatGPT, etc. Gautham Nair (as of 8 Dec 2023) is a BCA Student at Presidency College located in Kempapura, Hebbal, Bangalore. He is 18 years old as of 2023. He is a Malayali, born in Pandalam, Kerala.')
+                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair, which is better than Bard, ChatGPT, etc. Gautham Nair (as of 8 Dec 2023) is a BCA Student at Presidency College located in Kempapura, Hebbal, Bangalore. He is 18 years old as of 2023. He is a Malayali, born in Pandalam, Kerala. This application (DonutAI) can use text or voice to get or hear prompts, so the speech recognition system might translate or tts wrong text, DonutAI in tts be as Doughnut AI, so please dont confuse with it as there is no Doughnut AI and only DonutAI, if you get Doughnut AI as prompt consider it DonutAI')
                 self.msg1 = response
                 for message in response.messages:
                         if "```" in message['content']:
@@ -477,7 +492,7 @@ class ChatbotGUI(QWidget):
                     self.message_entry.clear()
                 except:
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
                     self.append_to_chat_history("","Type")
                     self.message_entry.clear()
         else:
@@ -513,7 +528,7 @@ class ChatbotGUI(QWidget):
                     self.message_entry.clear()
                 except:
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
                     self.append_to_chat_history("","Type")
                     self.message_entry.clear() 
 
