@@ -8,6 +8,7 @@ from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 from langchain.llms import GooglePalm
+import google.generativeai as palm
 import time
 import wolframalpha
 import json
@@ -18,6 +19,7 @@ developer_keywords = ["who developed you", "who developed you?", "who created yo
 
 key = input("Insert Google PaLM API Key: ")
 llm=GooglePalm(google_api_key=key)
+palm.configure(api_key=key)
 llm.temperature=1.0
 
 class ChatbotGUI(QWidget):
@@ -127,7 +129,7 @@ class ChatbotGUI(QWidget):
             </html>
         """)
         
-
+        self.msg1 = None
 
         self.message_entry = QLineEdit()
         self.send_button = QPushButton()
@@ -140,25 +142,20 @@ class ChatbotGUI(QWidget):
         # Set window title and icon
         self.setWindowTitle('DonutAI PREVIEW')
         self.setWindowIcon(QIcon('velocity.png'))
+        
 
         # Create logo
         logo = QPixmap('velocity.png')
+        logo = logo.scaled(80, 80, Qt.KeepAspectRatio)
         self.logo_label = QLabel()
         self.logo_label.setPixmap(logo)
 
         # Create heading
         self.heading = QLabel('DonutAI <sup>Preview</sup>')
-        self.heading.setStyleSheet("font-size: 24px; color: orange;")
+        self.heading.setStyleSheet("font-size: 18px; color: orange;")
 
         self.logo_label.setAlignment(Qt.AlignCenter)
         self.heading.setAlignment(Qt.AlignCenter)
-
-
-        # Initialize pyttsx3
-        self.engine = pyttsx3.init()
-        self.engine.setProperty('rate', 150)
-        voices = self.engine.getProperty('voices')
-        self.engine.setProperty('voice', voices[1].id)
         self.send_button.setFixedSize(60, 60)
         self.voice_button.setFixedSize(60, 60)
 
@@ -189,6 +186,7 @@ class ChatbotGUI(QWidget):
         layout.addWidget(self.chat_history,1)
         layout.addLayout(button_layout)
         self.setLayout(layout)
+        self.reply_mode = "False"
 
         # Connect signals and slots
         self.send_button.clicked.connect(self.send)
@@ -197,11 +195,6 @@ class ChatbotGUI(QWidget):
     def scroll_to_bottom(self):
         js_code = "window.scrollTo(0, document.body.scrollHeight);"
         self.chat_history.page().runJavaScript(js_code)
-
-    def speak(self, text):
-        engine = pyttsx3.init()
-        engine.say(text)
-        engine.runAndWait()
         
 
     def append_to_chat_history(self, text, is_user_message):
@@ -224,7 +217,6 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=(response,)).start()
         except:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
@@ -259,56 +251,48 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The time is "+strTime,)).start()
             elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
                 strDate = time.strftime("%d/%m/%Y")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The date is "+strDate,)).start()
             elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
                 strDay = time.strftime("%A")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The day is "+strDay,)).start()
             elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
                 strMonth = time.strftime("%B")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The month is "+strMonth,)).start()
             elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
                 strYear = time.strftime("%Y")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The year is "+strYear,)).start()
             elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
                 strHour = time.strftime("%H")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The hour is "+strHour,)).start()
             elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
                 strMinute = time.strftime("%M")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The minute is "+strMinute,)).start()
             elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
                 strSecond = time.strftime("%S")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("The second is "+strSecond,)).start()
             elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
                 self.append_to_chat_history("","Type")
@@ -328,17 +312,14 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("Bye! You can press the 'X' or colese button to close the window.",)).start()
             elif msg in donutai_keywords:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.",)).start()
             elif msg in developer_keywords:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : I was developed by Gautham Nair.</p>", False)
                 self.append_to_chat_history("","Type")
                 self.message_entry.clear()
-                threading.Thread(target=self.speak, args=("I was developed by Gautham Nair.",)).start()
             else:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
@@ -350,12 +331,10 @@ class ChatbotGUI(QWidget):
         except sr.UnknownValueError:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", False)
-            threading.Thread(target=self.speak, args=("Sorry, I couldn't understand, or didnt hear what you said. Please try again!",)).start()
             return ""
         except sr.RequestError as e:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", False)
-            threading.Thread(target=self.speak, args=("Sorry, I couldn't understand, or didnt hear what you said. Please try again!",)).start()
             return ""
             
     def get_voice_input(self):
@@ -385,56 +364,48 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The time is "+strTime,)).start()
         elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
             strDate = time.strftime("%d/%m/%Y")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The date is "+strDate,)).start()
         elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
             strDay = time.strftime("%A")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The day is "+strDay,)).start()
         elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
             strMonth = time.strftime("%B")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The month is "+strMonth,)).start()
         elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
             strYear = time.strftime("%Y")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The year is "+strYear,)).start()
         elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
             strHour = time.strftime("%H")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The hour is "+strHour,)).start()
         elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
             strMinute = time.strftime("%M")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The minute is "+strMinute,)).start()
         elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
             strSecond = time.strftime("%S")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("The second is "+strSecond,)).start()
         elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
             self.append_to_chat_history("","Type")
@@ -455,17 +426,14 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("Bye! You can press the 'X' or colese button to close the window.",)).start()
         elif msg in donutai_keywords:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("Hi! I am DonutAI. I am a chatbot created by Gautham Nair. I am still in development, so please forgive me if I make any mistakes.",)).start()
         elif msg in developer_keywords:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : I was developed by Gautham Nair.</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
-            threading.Thread(target=self.speak, args=("I was developed by Gautham Nair.",)).start()
         else:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
@@ -474,50 +442,80 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             threading.Thread(target=self.generate_response, args=(msg,)).start()
-    
+
     def generate_response(self, msg):
-        msg = [msg]
-        llm_results= llm._generate(msg)
-        response=llm_results.generations
-
-        engine = pyttsx3.init()
-
-        if response and len(response[0]) > 0:  # Check if response is not empty and contains at least one element
-            response_text = markdown.markdown(response[0][0].text, extensions=['extra'])
-
-            # Check if the response is a code snippet
-            if response_text.startswith('```') and response_text.endswith('```'):
-                # Remove the backticks and wrap the response in a <pre> tag
-                response_text = '<pre>' + response_text[3:-3] + '</pre>'
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:#FFA500;'>"+response_text+"</p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
-            else:
-                response_text = response_text.replace('&quot;', '"')
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:#FFA500;'>"+response_text+"</p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
-
-            engine.say(response_text)
-            engine.runAndWait()
+        if self.reply_mode == "False":
+            try:
+                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair, which is better than Bard, ChatGPT, etc. Gautham Nair (as of 8 Dec 2023) is a BCA Student at Presidency College located in Kempapura, Hebbal, Bangalore. He is 18 years old as of 2023. He is a Malayali, born in Pandalam, Kerala.')
+                self.msg1 = response
+                for message in response.messages:
+                        if "```" in message['content']:
+                            response_text = message['content']
+                            response_text = '<pre>' + response_text + '</pre>'
+                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                            self.append_to_chat_history("","Type")
+                            self.message_entry.clear()
+                            self.reply_mode = True
+                        else:
+                            response_text = message['content']
+                            response_text = markdown.markdown(response_text)
+                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                            self.append_to_chat_history("","Type")
+                            self.message_entry.clear()
+                            self.reply_mode = True
+            except Exception as e:
+                print(e)
+                try:
+                    client = wolframalpha.Client('UL8UPY-4EHX5683WH')
+                    res = client.query(msg)
+                    response = next(res.results).text
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                except:
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
         else:
             try:
-                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                res = client.query(msg)
-                response = next(res.results).text
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:#FFA500;'>"+response+"</p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
-                threading.Thread(target=self.speak, args=(response,)).start()
-            except:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
-                self.append_to_chat_history("","Type")
-                self.message_entry.clear()
-    
+                print("Level 1 success")
+                response = self.msg1.reply(msg)
+                if "```" in response.last:
+                    response_text = response.last
+                    response_text = '<pre>' + response_text + '</pre>'
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                    self.reply_mode = True
+                else:
+                    response_text = response.last
+                    response_text = markdown.markdown(response_text)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                    self.reply_mode = True
+                self.msg1 = response
+            except Exception as e:
+                print(e)
+                try:
+                    client = wolframalpha.Client('UL8UPY-4EHX5683WH')
+                    res = client.query(msg)
+                    response = next(res.results).text
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                except:
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear() 
 
 app = QApplication(sys.argv)
 window = ChatbotGUI()
