@@ -1,5 +1,4 @@
 import sys
-import pyttsx3
 import threading
 import markdown
 import speech_recognition as sr
@@ -7,20 +6,14 @@ from PyQt5.QtWidgets import QApplication, QSizePolicy,QWidget, QVBoxLayout, QHBo
 from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-from langchain.llms import GooglePalm
 import google.generativeai as palm
 import time
 import wolframalpha
 import json
 import subprocess
 
-donutai_keywords = ["DonutAI", "donutai", "Donutai", "donutAI", "Donut AI", "donut ai", "donutAi", "donut AI"]
-developer_keywords = ["who developed you", "who developed you?", "who created you", "who created you?", "who made you", "who made you?", "who is your developer", "who is your developer?", "who is your creator", "who is your creator?", "who is your father", "who is your father?", "who is your dad", "who is your dad?", "who is your daddy", "who is your daddy?", "Who developed you", "Who developed you?", "Who created you", "Who created you?", "Who made you", "Who made you?", "Who is your developer", "Who is your developer?", "Who is your creator", "Who is your creator?", "Who is your father", "Who is your father?", "Who is your dad", "Who is your dad?", "Who is your daddy", "Who is your daddy?"]
-
 key = input("Insert Google PaLM API Key: ")
-llm=GooglePalm(google_api_key=key)
 palm.configure(api_key=key)
-llm.temperature=1.0
 
 class ChatbotGUI(QWidget):
     def __init__(self):
@@ -464,24 +457,30 @@ class ChatbotGUI(QWidget):
                 response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair, which is better than Bard, ChatGPT, etc. Gautham Nair (as of 8 Dec 2023) is a BCA Student at Presidency College located in Kempapura, Hebbal, Bangalore. He is 18 years old as of 2023. He is a Malayali, born in Pandalam, Kerala. This application (DonutAI) can use text or voice to get or hear prompts, so the speech recognition system might translate or tts wrong text, DonutAI in tts be as Doughnut AI, so please dont confuse with it as there is no Doughnut AI and only DonutAI, if you get Doughnut AI as prompt consider it DonutAI')
                 self.msg1 = response
                 for message in response.messages:
-                        if "```" in message['content']:
-                            response_text = message['content']
-                            response_text = '<pre>' + response_text + '</pre>'
-                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
-                            self.append_to_chat_history("","Type")
-                            self.message_entry.clear()
-                            self.reply_mode = True
-                        else:
-                            response_text = message['content']
-                            response_text = markdown.markdown(response_text)
-                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
-                            self.append_to_chat_history("","Type")
-                            self.message_entry.clear()
-                            self.reply_mode = True
+                    if "```" in message['content']:
+                        parts = message['content'].split("```")
+                        full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
+                        is_code = False
+                        for part in parts:
+                            if is_code:
+                                part = '<pre>' + part + '</pre>'
+                            else:
+                                part = markdown.markdown(part)
+                            full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
+                            is_code = not is_code
+                        self.append_to_chat_history(full_message, False)
+                        self.append_to_chat_history("","Type")
+                        self.message_entry.clear()
+                        self.reply_mode = True
+                    else:
+                        response_text = message['content']
+                        response_text = markdown.markdown(response_text)
+                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                        self.append_to_chat_history("","Type")
+                        self.message_entry.clear()
+                        self.reply_mode = True
             except Exception as e:
-                print(e)
                 try:
                     client = wolframalpha.Client('UL8UPY-4EHX5683WH')
                     res = client.query(msg)
@@ -497,13 +496,19 @@ class ChatbotGUI(QWidget):
                     self.message_entry.clear()
         else:
             try:
-                print("Level 1 success")
                 response = self.msg1.reply(msg)
                 if "```" in response.last:
-                    response_text = response.last
-                    response_text = '<pre>' + response_text + '</pre>'
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                    parts = response.last.split("```")
+                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
+                    is_code = False
+                    for part in parts:
+                        if is_code:
+                            part = '<pre>' + part + '</pre>'
+                        else:
+                            part = markdown.markdown(part)
+                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
+                        is_code = not is_code
+                    self.append_to_chat_history(full_message, False)
                     self.append_to_chat_history("","Type")
                     self.message_entry.clear()
                     self.reply_mode = True
@@ -517,7 +522,6 @@ class ChatbotGUI(QWidget):
                     self.reply_mode = True
                 self.msg1 = response
             except Exception as e:
-                print(e)
                 try:
                     client = wolframalpha.Client('UL8UPY-4EHX5683WH')
                     res = client.query(msg)
