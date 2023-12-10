@@ -21,6 +21,12 @@ class ChatbotGUI(QWidget):
         super().__init__()
         self.stop_flag = False
         self.chat_history = QWebEngineView()
+        self.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #F0F0F0, stop:1 #e6e6e6);
+            }
+        """)
         self.chat_history.setHtml("""
             <html>
             <head>
@@ -140,7 +146,7 @@ class ChatbotGUI(QWidget):
                         font-family: Segoe UI;
                         font-size: 16px;
                         color: black;
-                        background-color: #F0F0F0;
+                        background: linear-gradient(to bottom, #f0f0f0, #e6e6e6);
                     }
                 </style>
             </head>
