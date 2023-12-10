@@ -1,3 +1,3 @@
 # DonutAI
 DonutAI Assistant
-Based on Google PaLM 2 and DonutLLM 2
+Based on DonutLLM 6
