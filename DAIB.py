@@ -461,7 +461,7 @@ class ChatbotGUI(QWidget):
     def generate_response(self, msg):
         if self.reply_mode == "False":
             try:
-                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair, which is better than Bard, ChatGPT, etc. Gautham Nair (as of 8 Dec 2023) is a BCA Student at Presidency College located in Kempapura, Hebbal, Bangalore. He is 18 years old as of 2023. He is a Malayali, born in Pandalam, Kerala. This application (DonutAI) can use text or voice to get or hear prompts, so the speech recognition system might translate or tts wrong text, DonutAI in tts be as Doughnut AI, so please dont confuse with it as there is no Doughnut AI and only DonutAI, if you get Doughnut AI as prompt consider it DonutAI')
+                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair.')
                 self.msg1 = response
                 for message in response.messages:
                     if "```" in message['content']:
