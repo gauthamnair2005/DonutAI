@@ -1,708 +1,545 @@
-import pyttsx3
-import speech_recognition as sr
-import datetime
-import wikipedia
-import webbrowser
-import os
-import smtplib
-import requests
-import wolframalpha
-import subprocess
-import pyjokes
-import time
-import google.generativeai
-from langchain.embeddings import GooglePalmEmbeddings
-from langchain.llms import GooglePalm
-from bs4 import BeautifulSoup
-from PyInquirer import Separator, prompt
+import sys
+import threading
 import markdown
+import speech_recognition as sr
+from PyQt5.QtWidgets import QApplication, QSizePolicy,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel
+from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
+from PyQt5.QtCore import Qt
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+import google.generativeai as palm
+import time
+import wolframalpha
+import json
+import subprocess
+import html
 
-questions = [
-    {
-        'type': 'list',
-        'name': 'assistant_type',
-        'message': 'Select an assistant type:',
-        'choices': [
-            'Mike',
-            'Annie',
-            Separator(),
-            {
-                'name': 'Exit',
-                'value': 'exit'
+key = input("Insert Google PaLM API Key: ")
+palm.configure(api_key=key)
+
+class ChatbotGUI(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.stop_flag = False
+        self.chat_history = QWebEngineView()
+        self.setStyleSheet("""
+            QWidget {
+                background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #F0F0F0, stop:1 #e6e6e6);
             }
-        ]
-    }
-]
-model_id="models/chat-bison-001"
-llm=GooglePalm(google_api_key="API")
-llm.temperature=0.7
+        """)
+        self.chat_history.setHtml("""
+            <html>
+            <head>
+                <style>
+                    .user-bubble {
+                        position: relative;
+                        background: #adcbe3;
+                        border-radius: 1em;
+                        color: white;
+                        padding: 10px;
+                        display: inline-block;
+                        margin: 10px;
+                        margin-bottom: 15px;
+                        float: right;
+                        clear: both;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+                    }
 
-print("DonutAI PREVIEW v2")
-print("Built On Donut Assistant")
-print("Gautham Nair")
-print("More AI Features Coming Soon")
+                    .user-bubble:after {
+                        content: '';
+                        position: absolute;
+                        right: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-left-color: #0084ff;
+                        border-right: 0;
+                        border-left: 0;
+                        margin-top: -10px;
+                        margin-right: -20px;
+                    }
 
-assistanttype = prompt(questions)
-if assistanttype['assistant_type'] == "Mike":
-    engine = pyttsx3.init()
-    engine.setProperty('rate',150)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[0].id)
+                    .ai-bubble {
+                        position: relative;
+                        background: #f6cd61;
+                        border-radius: 1em;
+                        color: black;
+                        padding: 10px;
+                        display: inline-block;
+                        margin: 10px;
+                        margin-bottom: 15px;
+                        float: left;
+                        clear: both;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+                    }
 
+                    .ai-bubble:after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-right-color: #f0f0f0;
+                        border-left: 0;
+                        border-right: 0;
+                        margin-top: -10px;
+                        margin-left: -20px;
+                    }
+                    .genmessage {
+                        position: center;
+                        background: white;
+                        border-radius: 0.4em;
+                        color: black;
+                        padding: 5px;
+                        display: inline-block;
+                        margin: 5px;
+                        margin-bottom: 5px;
+                        float: left;
+                        clear: both;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
+                    }
+                    .genmesage:after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-right-color: #f0f0f0;
+                        border-left: 0;
+                        border-right: 0;
+                        margin-top: -10px;
+                        margin-left: -20px;
+                    }
+                    .error {
+                        position: center;
+                        background: red;
+                        border-radius: 0.4em;
+                        color: black;
+                        padding: 10px;
+                        display: inline-block;
+                        margin: 10px;
+                        margin-bottom: 15px;
+                        float: left;
+                        clear: both;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
+                    }
+                    .error:after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-right-color: #f0f0f0;
+                        border-left: 0;
+                        border-right: 0;
+                        margin-top: -10px;
+                        margin-left: -20px;
+                    }
+                    body {
+                        font-family: Segoe UI;
+                        font-size: 16px;
+                        color: black;
+                        background: linear-gradient(to bottom, #f0f0f0, #e6e6e6);
+                    }
+                </style>
+            </head>
+            <body>
+                <p style='font-family: Segoe UI; text-align:center;color:gray;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
+            </body>
+            </html>
+        """)
+        
+        self.msg1 = None
 
-    def speak(audio):                   
-        engine.say(audio)
-        engine.runAndWait()
+        self.message_entry = QLineEdit()
+        self.send_button = QPushButton()
+        self.send_button.setIcon(QIcon('send.png'))
+        self.send_button.setStyleSheet("QPushButton {background-color: lightblue; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        self.voice_button = QPushButton()
+        self.voice_button.setIcon(QIcon('voice.png'))
+        self.voice_button.setStyleSheet("QPushButton {background-color: lightblue; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        
+        # Set window title and icon
+        self.setWindowTitle('DonutAI PREVIEW')
+        self.setWindowIcon(QIcon('velocity.png'))
+        
 
+        # Create logo
+        logo = QPixmap('velocity.png')
+        logo = logo.scaled(80, 80, Qt.KeepAspectRatio)
+        self.logo_label = QLabel()
+        self.logo_label.setPixmap(logo)
 
-    def wishMe():
-        hour = int(datetime.datetime.now().hour)
-        if hour>=0 and hour<12:
-            print("Good Morning!")
-            speak("Good Morning!")
+        # Create heading
+        self.heading = QLabel('DonutAI <sup>Preview</sup>')
+        self.heading.setStyleSheet("font-size: 18px; color: orange;")
 
-        elif hour>=12 and hour<14:
-            print("Good Afternoon!")
-            speak("Good Afternoon!")
+        self.logo_label.setAlignment(Qt.AlignCenter)
+        self.heading.setAlignment(Qt.AlignCenter)
+        self.send_button.setFixedSize(60, 60)
+        self.voice_button.setFixedSize(60, 60)
 
+        # Set styles
+        self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: white;")
+        self.message_entry.setStyleSheet("font-size: 20px; color: black; background-color: white;")
+
+        self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        # Set the size policy of the prompt box
+        self.message_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+
+        self.message_entry.setFocus()
+
+        # Decrease the size of the buttons and place them beside the prompt box
+        self.send_button.setFixedWidth(50)
+        self.voice_button.setFixedWidth(50)
+
+        button_layout = QHBoxLayout()
+        button_layout.addWidget(self.message_entry)
+        button_layout.addWidget(self.send_button)
+        button_layout.addWidget(self.voice_button)
+
+        # Arrange widgets
+        layout = QVBoxLayout()
+        layout.addWidget(self.logo_label)
+        layout.addWidget(self.heading)
+        layout.addWidget(self.chat_history,1)
+        layout.addLayout(button_layout)
+        self.setLayout(layout)
+        self.reply_mode = "False"
+
+        # Connect signals and slots
+        self.send_button.clicked.connect(self.send)
+        self.voice_button.clicked.connect(self.get_voice_input)
+
+    def scroll_to_bottom(self):
+        js_code = "window.scrollTo(0, document.body.scrollHeight);"
+        self.chat_history.page().runJavaScript(js_code)
+        
+
+    def append_to_chat_history(self, text, is_user_message):
+        plain_text = QTextDocument(text).toPlainText()
+        if is_user_message == True:
+            escaped_text = json.dumps("<div class='user-bubble'>" + plain_text + "</div><br>")
+        elif is_user_message == False:
+            escaped_text = json.dumps("<div class='ai-bubble'>" + plain_text + "</div><br>")
+        elif is_user_message == "Error":
+            escaped_text = json.dumps("<div class='error'>" + plain_text + "</div><br>")
         else:
-            print("Good Evening!")
-            speak("Good Evening!")
+            escaped_text = json.dumps("<div class='genmessage'>" + plain_text + "</div><br>")
+        self.chat_history.page().runJavaScript("document.body.innerHTML += " + escaped_text + ";")
+        self.scroll_to_bottom()
 
-        print("I am DonutAI Mike. Please tell me how may I help you?")
-        speak("I am DonutAI Mike. Ask me anything!!!")
+    def wolf(self, msg):
+        try:
+            client = wolframalpha.Client('UL8UPY-4EHX5683WH')
+            res = client.query(msg)
+            response = next(res.results).text
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        except:
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
 
-    def takeCommand():
-        #It takes microphone input from the user and returns string output
 
+    def record_and_process(self):
         r = sr.Recognizer()
         with sr.Microphone() as source:
-            print("Listening...")
-            speak("I'm Listening..!")
-            r.pause_threshold = 1
             audio = r.listen(source)
-
         try:
-            print("Recognizing...")    
-            query = r.recognize_google(audio, language='en-in')
-            print(f"User said: {query}\n")
-
-        except Exception as e:
-            # print(e)    
-            print("Say that again please...")
-            speak('I didnt hear anything, if you said anything please speak loud and clear')
-            return ""
-        return query
-
-    def sendEmail(to, content):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.ehlo()
-        server.starttls()
-        email = input("Enter your gmail username: ")
-        psswrd = input("Enter yourn gmail password: ")
-        try:
-            server.login(email, psswrd)
-            server.sendmail(email, to, content)
-            server.close()
-            print("E-mail kas been sent")
-            speak("E-Mail has been sent")
-        except Exception as e:
-            print("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
-            speak("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
-
-    if __name__ == "__main__":
-        wishMe()
-        while True:
-        # if 1:
-            query = takeCommand().lower()
-
-            # Logic for executing tasks based on query
-            if 'wikipedia' in query:
-                speak('Searching Wikipedia...')
-                query = query.replace("wikipedia", "")
-                results = wikipedia.summary(query, sentences=2)
-                print("Generating Answers..!")
-                speak("According to Wikipedia")
-                print(results)
-                speak(results)
-
-            elif query == "tell me some jokes" or query == "tell some jokes" or query == "tell a joke" or query == "joke" or query == "jokes":
-                My_joke = pyjokes.get_joke(language="en", category="neutral")
-                print(My_joke)
-                speak(My_joke)
-
-
-            elif 'question' in query:
-                speak('I can answer to computational and geographical questions, what question do you want to ask now')
-                question=takeCommand()
-                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                res = client.query(question)
-                answer = next(res.results).text
-                speak(answer)
-                print(answer)
-
-            elif "calculate" in query:
-
-                app_id = "UL8UPY-4EHX5683WH"
-                client = wolframalpha.Client(app_id)
-                indx = query.lower().split().index('calculate')
-                query = query.split()[indx + 1:]
-                res = client.query(' '.join(query))
-                answer = next(res.results).text
-                print("The answer is " + answer)
-                speak("The answer is " + answer)
-
-            elif 'open youtube' in query:
-                speak('OK, I will open YouTube in your default browser')
-                webbrowser.open("youtube.com")
-
-            elif 'open browser' in query:
-                webbrowser.open("google.com")
-
-            elif 'open google' in query or 'open Google' in query:
-                speak('Opening Google in your default browser')
-                webbrowser.open("google.com")
-
-            elif 'open bing' in query:
-                speak('Opening bing in your default browser')
-                webbrowser.open("bing.com")
-
-            elif 'send feedback' in query:
-                speak('This will open Donut Support Website in your default browser, you can give feedback there!')
-                webbrowser.open("Donutsupport.simdif.com")
-
-            elif 'open stackoverflow' in query or 'open stack overflow' in query:
-                speak('Opening StackOverflow in your default browser')
-                webbrowser.open("stackoverflow.com")   
-
-
-            elif 'play music' in query:
-                try:
-                    musidir = input("Enter directory address: ")
-                    music_dir = musidir
-                    songs = os.listdir(music_dir)
-                    print(songs)    
-                    os.startfile(os.path.join(music_dir, songs[0]))
-                except:
-                    speak("Sorry Friend!! I couldn't find the directory specified")
-
-            elif 'time' in query:
-                strTime = datetime.datetime.now().strftime("%H:%M:%S")
-                print(strTime)
-                speak(f"Friend, the time is {strTime}")
-
-            elif 'text to speech' in query:
-                text = input("Type: ")
-                speak(text)
-
-            elif 'when is your birthday' in query:
-                print("1st March 2022")
-                speak('I made my debut on 1st March 2022')
-
-            elif 'your developers name' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-            
-            elif 'who developed you' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-
-            elif 'what is your developers name' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-
-            elif 'open code' in query:
-                codePath = "code"
-                os.startfile(codePath)
-
-            elif 'what is your name' in query:
-                speak('As I told you in the beginning, my name is DonutAI Mike')
-                print("I am DonutAI Mike")
-
-            elif 'who made you' in query:
-                speak('Who made me??? Gautham Nair')
-                speak('He is super genius')
-
-            elif 'what do you eat' in query:
-                speak("I dont't eat the food that humans eat, but i like to have bits and bytes")
-
-            elif 'where do you live' in query:
-                speak("I live in your computer")
-
-            elif 'can you sing a song' in query:
-                speak('Im noot good at singing, since i am a bot')
-                speak('But since you asked me, i will sing it for you')
-                speak("I will sing my favourite song")
-                speak("The song is Michael Jackson's Smooth Criminal") 
-                speak('''As he came into the window!!!!
-                            Was the sound of a crescendo!!!
-                            He came into her apartment!!!
-                            He left the bloodstains on the carpet!!!
-                            She ran underneath the table!!!
-                            He could see she was unable!!!
-                            So she ran into the bedroom!!!
-                            She was struck down, it was her doom!!!
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            Will you tell us that you're okay?
-                            There's a sound at the window
-                            Then he struck you, a crescendo Annie
-                            He came into your apartment
-                            He left the bloodstains on the carpet
-                            And then you ran into the bedroom
-                            You were struck down
-                            It was your doom
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            You've been hit by-
-                            You've been hit by-
-                            A smooth criminal
-                            So they came in to the outway
-                            It was Sunday, what a black day
-                            Mouth-to-mouth resuscitation
-                            Sounding heartbeats, intimidation
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            Will you tell us that you're okay?
-                            There's a sound at the window
-                            That he struck you a crescendo Annie
-                            He came into your apartment
-                            He left the bloodstains on the carpet
-                            Then you ran into the bedroom
-                            You were struck down
-                            It was your doom
-                            Annie, are you okay? So, Annie, are you okay?
-                            Are you okay, Annie?
-                            You've been hit by-
-                            You've been struck by-
-                            A smooth criminal
-                            Okay, I want everybody to clear the area right now
-                            Annie, are you okay? (I don't know)
-                            Will you tell us, that you're okay? (I don't know)
-                            There's a sound at the window (I don't know)
-                            Then he struck you, a crescendo Annie (I don't know)
-                            He came into your apartment (I don't know)
-                            Left bloodstains on the carpet (I don't know why, baby)
-                            And then you ran into the bedroom (help me)
-                            You were struck down
-                            It was your doom, Annie (dag gone it)
-                            Annie, are you okay? (Dag gone it-baby)
-                            Will you tell us that you're okay? (Dag gone it-baby)
-                            There's a sound at the window (dag gone it-baby)
-                            Then he struck you, a crescendo Annie
-                            He came into your apartment (dag gone it)
-                            Left bloodstains on the carpet (hoo, hoo, hoo)
-                            And then you ran into the bedroom
-                            You were struck down (dag gone it)
-                            It was your doom Annie''')
-
-            elif 'can i change your name' in query:
-                print("Sorry Friend!")
-                speak("Sorry Friend!, only my developers can change my name")
-
-            elif 'do you know alexa' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know cortana' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know google assistant' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know siri' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know bixby' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'who is your favourite artist' in query:
-                print("Michael Jackson")
-                speak('No doubt,, its michael jackson')
-
-            elif 'exit' in query:
-                print("Goodbye!!")
-                speak('Goodbye!!, you can call me anytime')
-                break
-
-            elif 'email' in query:
-                try:
-                    useria = input("Email to whom?..Type it: ")
-                    speak("What should I say?")
-                    content = takeCommand()
-                    to = useria    
-                    sendEmail(to, content)
-                except Exception as e:
-                    print(e)
-                    speak("Sorry my friend. I am not able to send this email")
-
-            elif "log off" in query or "sign out" in query:
-                speak("Ok , your pc will log off in 10 sec make sure you exit from all applications")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Recognizing..!</p>", "Random")
+            msg = r.recognize_google(audio)
+            if msg == "":
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Prompt cannot be empty.</p>", "Error")
+                self.append_to_chat_history("", False)
+                self.message_entry.clear()
+                return
+            elif 'weather' in msg:
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
+                self.append_to_chat_history("","Type")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+                threading.Thread(target=self.wolf, args=(msg,)).start()
+            elif msg == "Whats is time" or msg == "What is time" or msg == "what is time" or msg == "whats is time":
+                strTime = time.strftime("%H:%M:%S")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
+                strDate = time.strftime("%d/%m/%Y")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
+                strDay = time.strftime("%A")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
+                strMonth = time.strftime("%B")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
+                strYear = time.strftime("%Y")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
+                strHour = time.strftime("%H")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
+                strMinute = time.strftime("%M")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
+                strSecond = time.strftime("%S")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+            elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
                 subprocess.call(["shutdown", "/l"])
-            
+            elif msg == "restart" or msg == "Restart":
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Restarting your PC!</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+                subprocess.call(["shutdown", "/r"])
+            elif msg == "shutdown" or msg == "Shutdown":
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Shutting down your PC!</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+                subprocess.call(["shutdown", "/s"])
+            elif msg == "exit":
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
             else:
-                if query == "":
-                    print()
-                else:
-                    try:
-                        prompt = [query]
-                        llm_results= llm._generate(prompt)
-                        res=llm_results.generations
-                        print("Generating Answers...!")
-                        print()
-                        print(res[0][0].text)
-                        speak(res[0][0].text)
-                    except Exception as e:
-                        print(e)
-                        speak("Sorry, I could not generate an answer for that.!")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
+                self.append_to_chat_history("","Type")
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+                threading.Thread(target=self.generate_response, args=(msg,)).start()
+        except sr.UnknownValueError:
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
+            return ""
+        except sr.RequestError as e:
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
+            return ""
+            
+    def get_voice_input(self):
+        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Listening..!</p>", "Random")
+        self.append_to_chat_history("","Type")
+        threading.Thread(target=self.record_and_process).start()
+    
+    def send(self):
+        msg = self.message_entry.text()
+        if msg == "":
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Prompt cannot be empty.</p>", "Error")
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            return
+        elif 'weather' in msg:
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
+            self.append_to_chat_history("","Type")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            threading.Thread(target=self.wolf, args=(msg,)).start()
+        elif msg == "Whats is time" or msg == "What is time" or msg == "what is time" or msg == "whats is time":
+            strTime = time.strftime("%H:%M:%S")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
+            strDate = time.strftime("%d/%m/%Y")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
+            strDay = time.strftime("%A")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
+            strMonth = time.strftime("%B")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
+            strYear = time.strftime("%Y")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
+            strHour = time.strftime("%H")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
+            strMinute = time.strftime("%M")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
+            strSecond = time.strftime("%S")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+        elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            subprocess.call(["shutdown", "/l"])
+        elif msg == "restart" or msg == "Restart":
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Restarting your PC!</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            subprocess.call(["shutdown", "/r"])
+        elif msg == "shutdown" or msg == "Shutdown":
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Shutting down your PC!</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            subprocess.call(["shutdown", "/s"])
 
-    time.sleep(3)
-
-elif assistanttype['assistant_type'] == "Annie":
-    engine = pyttsx3.init()
-    engine.setProperty('rate',150)
-    voices = engine.getProperty('voices')
-    engine.setProperty('voice', voices[1].id)
-
-
-    def speak(audio):
-        engine.say(audio)
-        engine.runAndWait()
-
-
-    def wishMe():
-        hour = int(datetime.datetime.now().hour)
-        if hour>=0 and hour<12:
-            print("Good Morning!")
-            speak("Good Morning!")
-
-        elif hour>=12 and hour<18:
-            print("Good Afternoon!")
-            speak("Good Afternoon!")
-
+        elif msg == "exit":
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
         else:
-            print("Good Evening!")
-            speak("Good Evening!")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>You : </p>", True)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:darkviolet;'>"+msg+"</p>", True)
+            self.append_to_chat_history("","Type")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
+            self.append_to_chat_history("","Type")
+            self.message_entry.clear()
+            threading.Thread(target=self.generate_response, args=(msg,)).start()
 
-        print("I am DonutAI Annie. Please tell me how may I help you")
-        speak("I am DonutAI Annie. Ask me anything!!!")
-
-    def takeCommand():
-        #It takes microphone input from the user and returns string output
-
-        r = sr.Recognizer()
-        with sr.Microphone() as source:
-            print("Listening...")
-            speak("I'm Listening..!")
-            r.pause_threshold = 1
-            audio = r.listen(source)
-
-        try:
-            print("Recognizing...")    
-            query = r.recognize_google(audio, language='en-in')
-            print(f"User said: {query}\n")
-
-        except Exception as e:
-            # print(e)    
-            print("Say that again please...")
-            speak('I didnt hear anything, if you said anything please speak loud and clear')
-            return ""
-        return query
-
-    def sendEmail(to, content):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.ehlo()
-        server.starttls()
-        email = input("Enter your gmail username: ")
-        psswrd = input("Enter yourn gmail password: ")
-        try:
-            server.login(email, psswrd)
-            server.sendmail(email, to, content)
-            server.close()
-        except Exception as e:
-            print("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
-            speak("An unexpected error occurred, did you try enabling less secure application in your Gmail Settings?")
-
-    if __name__ == "__main__":
-        wishMe()
-        while True:
-        # if 1:
-            query = takeCommand().lower()
-
-            # Logic for executing tasks based on query
-            if 'wikipedia' in query:
-                speak('Searching Wikipedia...')
-                query = query.replace("wikipedia", "")
-                results = wikipedia.summary(query, sentences=2)
-                speak("According to Wikipedia")
-                print(results)
-                speak(results)
-
-            elif query == "tell me some jokes" or query == "tell some jokes" or query == "tell a joke" or query == "joke" or query == "jokes":
-                My_joke = pyjokes.get_joke(language="en", category="neutral")
-                print(My_joke)
-                speak(My_joke)
-
-
-            elif 'question' in query:
-                speak('I can answer to computational and geographical questions  and what question do you want to ask now')
-                question=takeCommand()
-                client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                res = client.query(question)
-                answer = next(res.results).text
-                speak(answer)
-                print(answer)
-
-            elif "calculate" in query:
-
-                app_id = "UL8UPY-4EHX5683WH"
-                client = wolframalpha.Client(app_id)
-                indx = query.lower().split().index('calculate')
-                query = query.split()[indx + 1:]
-                res = client.query(' '.join(query))
-                answer = next(res.results).text
-                print("The answer is " + answer)
-                speak("The answer is " + answer)
-
-            elif 'open youtube' in query:
-                speak('OK, I will open YouTube in your default browser')
-                webbrowser.open("youtube.com")
-
-            elif 'open browser' in query:
-                webbrowser.open("google.com")
-
-            elif 'open bing' in query:
-                speak('Opening bing in your default browser')
-                webbrowser.open("bing.com")
-
-            elif 'send feedback' in query:
-                speak('This will open Donut Support Website in your default browser, you can give feedback there!')
-                webbrowser.open("Donutsupport.simdif.com")
-
-            elif 'open google' in query or 'open Google' in query:
-                speak('Opening google in your default browser')
-                webbrowser.open("google.com")
-
-            elif 'open stackoverflow' in query or 'open stack overflow' in query:
-                speak('Opening StackOverflow in your default browser')
-                webbrowser.open("stackoverflow.com")   
-
-
-            elif 'play music' in query:
-                try:
-                    musidir = input("Enter directory address: ")
-                    music_dir = musidir
-                    songs = os.listdir(music_dir)
-                    print(songs)    
-                    os.startfile(os.path.join(music_dir, songs[0]))
-                except:
-                    speak("Sorry Friend!! I couldn't find the directory specified")
-
-            elif 'time' in query:
-                strTime = datetime.datetime.now().strftime("%H:%M:%S")
-                print(strTime)
-                speak(f"Friend, the time is {strTime}")
-
-            elif 'text to speech' in query:
-                text = input("Type: ")
-                speak(text)
-
-            elif 'when is your birthday' in query:
-                print("1st March 2022")
-                speak('I made my debut on 1st March 2022')
-
-            elif 'your developers name' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-            
-            elif 'who developed you' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-
-            elif 'what is your developers name' in query:
-                print("Gautham Nair")
-                speak("Gautham Nair")
-
-            elif 'open code' in query:
-                codePath = "code"
-                os.startfile(codePath)
-
-            elif 'what is your name' in query:
-                speak('As I told you in the beginning, my name is DonutAI Annie')
-                print("I am DonutAI Annie")
-
-            elif 'who made you' in query:
-                speak('Who made me??? Gautham nair')
-                speak('He is a super genius')
-
-            elif 'what do you eat' in query:
-                speak("I dont't eat the food that humans eat, but i like to have bits and bytes")
-
-            elif 'where do you live' in query:
-                speak("I live in your computer")
-
-            elif 'can you sing a song' in query:
-                speak('Im noot good at singing, since i am a bot')
-                speak('But since you asked me, i will sing it for you')
-                speak("I will sing my favourite song")
-                speak("This song has my name in it!!")
-                speak("The song is Michael Jackson's Smooth Criminal") 
-                speak('''As he came into the window!!!!
-                            Was the sound of a crescendo!!!
-                            He came into her apartment!!!
-                            He left the bloodstains on the carpet!!!
-                            She ran underneath the table!!!
-                            He could see she was unable!!!
-                            So she ran into the bedroom!!!
-                            She was struck down, it was her doom!!!
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            Will you tell us that you're okay?
-                            There's a sound at the window
-                            Then he struck you, a crescendo Annie
-                            He came into your apartment
-                            He left the bloodstains on the carpet
-                            And then you ran into the bedroom
-                            You were struck down
-                            It was your doom
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            You've been hit by-
-                            You've been hit by-
-                            A smooth criminal
-                            So they came in to the outway
-                            It was Sunday, what a black day
-                            Mouth-to-mouth resuscitation
-                            Sounding heartbeats, intimidation
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            So, Annie, are you okay? Are you okay, Annie?
-                            Annie, are you okay?
-                            Will you tell us that you're okay?
-                            There's a sound at the window
-                            That he struck you a crescendo Annie
-                            He came into your apartment
-                            He left the bloodstains on the carpet
-                            Then you ran into the bedroom
-                            You were struck down
-                            It was your doom
-                            Annie, are you okay? So, Annie, are you okay?
-                            Are you okay, Annie?
-                            You've been hit by-
-                            You've been struck by-
-                            A smooth criminal
-                            Okay, I want everybody to clear the area right now
-                            Annie, are you okay? (I don't know)
-                            Will you tell us, that you're okay? (I don't know)
-                            There's a sound at the window (I don't know)
-                            Then he struck you, a crescendo Annie (I don't know)
-                            He came into your apartment (I don't know)
-                            Left bloodstains on the carpet (I don't know why, baby)
-                            And then you ran into the bedroom (help me)
-                            You were struck down
-                            It was your doom, Annie (dag gone it)
-                            Annie, are you okay? (Dag gone it-baby)
-                            Will you tell us that you're okay? (Dag gone it-baby)
-                            There's a sound at the window (dag gone it-baby)
-                            Then he struck you, a crescendo Annie
-                            He came into your apartment (dag gone it)
-                            Left bloodstains on the carpet (hoo, hoo, hoo)
-                            And then you ran into the bedroom
-                            You were struck down (dag gone it)
-                            It was your doom Annie''')
-
-            elif 'can i change your name' in query:
-                print("Sorry Friend!")
-                speak("Sorry Friend!, only my developers can change my name")
-
-            elif 'do you know alexa' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know cortana' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know google assistant' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know siri' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'do you know bixby' in query:
-                speak("Yes, I know her, I want to be famous like her one day")
-
-            elif 'who is your favourite artist' in query:
-                print("Michael Jackson")
-                speak('No doubt,, its michael jackson')
-
-            elif 'exit' in query:
-                print("Goodbye!!")
-                speak('Goodbye!!, you can call me anytime')
-                break
-
-            elif 'email' in query:
-                try:
-                    useria = input("Email to whom?..Type it: ")
-                    speak("What should I say?")
-                    content = takeCommand()
-                    to = useria    
-                    sendEmail(to, content)
-                except Exception as e:
-                    print(e)
-                    speak("Sorry my friend. I am not able to send this email")
-
-            elif "log off" in query or "sign out" in query:
-                speak("Ok , your pc will log off in 10 sec make sure you exit from all applications")
-                subprocess.call(["shutdown", "/l"])
-
-            else:
-                if query == "":
-                    print()
+    def generate_response(self, msg):
+        if self.reply_mode == "False":
+            try:
+                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair.')
+                self.msg1 = response
+                for message in response.messages:
+                    if "```" in message['content']:
+                        parts = message['content'].split("```")
+                        full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
+                        is_code = False
+                        for part in parts:
+                            if is_code:
+                                lines = part.split("\n")
+                                if len(lines) > 1:
+                                    language_name = '<strong>' + lines[0] + '</strong>'
+                                    code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                    part = language_name + code
+                                else:
+                                    part = '<pre><code>' + html.escape(part) + '</code></pre>'
+                            else:
+                                part = markdown.markdown(part)
+                            full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
+                            is_code = not is_code
+                        self.append_to_chat_history(full_message, False)
+                        self.append_to_chat_history("","Type")
+                        self.message_entry.clear()
+                        self.reply_mode = True
+                    else:
+                        response_text = message['content']
+                        response_text = markdown.markdown(response_text)
+                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                        self.append_to_chat_history("","Type")
+                        self.message_entry.clear()
+                        self.reply_mode = True
+            except Exception as e:
+                print(e)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
+        else:
+            try:
+                response = self.msg1.reply(msg)
+                if "```" in response.last:
+                    parts = response.last.split("```")
+                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
+                    is_code = False
+                    for part in parts:
+                        if is_code:
+                            lines = part.split("\n")
+                            if len(lines) > 1:
+                                language_name = '<strong>' + lines[0] + '</strong>'
+                                code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                part = language_name + code
+                            else:
+                                part = '<pre><code>' + html.escape(part) + '</code></pre>'
+                        else:
+                            part = markdown.markdown(part)
+                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
+                        is_code = not is_code
+                    self.append_to_chat_history(full_message, False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                    self.reply_mode = True
                 else:
-                    try:
-                        prompt = [query]
-                        llm_results= llm._generate(prompt)
-                        res=llm_results.generations
-                        print("Generating Answers..!")
-                        print()
-                        print(res[0][0].text)
-                        speak(res[0][0].text)
-                    except Exception as e:
-                        print(e)
-                        speak("Sorry, I could not generate an answer for that.!")
-else:
-    print("Exiting.!")
+                    response_text = response.last
+                    response_text = markdown.markdown(response_text)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                    self.reply_mode = True
+                self.msg1 = response
+            except Exception as e:
+                print(e)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear() 
 
-    time.sleep(3)
+app = QApplication(sys.argv)
+window = ChatbotGUI()
+window.show()
+sys.exit(app.exec_())
