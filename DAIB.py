@@ -11,6 +11,7 @@ import time
 import wolframalpha
 import json
 import subprocess
+import html
 
 key = input("Insert Google PaLM API Key: ")
 palm.configure(api_key=key)
@@ -463,7 +464,13 @@ class ChatbotGUI(QWidget):
                         is_code = False
                         for part in parts:
                             if is_code:
-                                part = '<pre>' + part + '</pre>'
+                                lines = part.split("\n")
+                                if len(lines) > 1:
+                                    language_name = '<strong>' + lines[0] + '</strong>'
+                                    code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                    part = language_name + code
+                                else:
+                                    part = '<pre><code>' + html.escape(part) + '</code></pre>'
                             else:
                                 part = markdown.markdown(part)
                             full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
@@ -481,6 +488,7 @@ class ChatbotGUI(QWidget):
                         self.message_entry.clear()
                         self.reply_mode = True
             except Exception as e:
+                print(e)
                 try:
                     client = wolframalpha.Client('UL8UPY-4EHX5683WH')
                     res = client.query(msg)
@@ -503,7 +511,13 @@ class ChatbotGUI(QWidget):
                     is_code = False
                     for part in parts:
                         if is_code:
-                            part = '<pre>' + part + '</pre>'
+                            lines = part.split("\n")
+                            if len(lines) > 1:
+                                language_name = '<strong>' + lines[0] + '</strong>'
+                                code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                part = language_name + code
+                            else:
+                                part = '<pre><code>' + html.escape(part) + '</code></pre>'
                         else:
                             part = markdown.markdown(part)
                         full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
@@ -522,6 +536,7 @@ class ChatbotGUI(QWidget):
                     self.reply_mode = True
                 self.msg1 = response
             except Exception as e:
+                print(e)
                 try:
                     client = wolframalpha.Client('UL8UPY-4EHX5683WH')
                     res = client.query(msg)
