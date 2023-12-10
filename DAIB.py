@@ -494,20 +494,10 @@ class ChatbotGUI(QWidget):
                         self.message_entry.clear()
                         self.reply_mode = True
             except Exception as e:
-                print(e)
-                try:
-                    client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                    res = client.query(msg)
-                    response = next(res.results).text
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
-                    self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
-                except:
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
-                    self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear()
         else:
             try:
                 response = self.msg1.reply(msg)
@@ -542,20 +532,10 @@ class ChatbotGUI(QWidget):
                     self.reply_mode = True
                 self.msg1 = response
             except Exception as e:
-                print(e)
-                try:
-                    client = wolframalpha.Client('UL8UPY-4EHX5683WH')
-                    res = client.query(msg)
-                    response = next(res.results).text
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
-                    self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
-                except:
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
-                    self.append_to_chat_history("","Type")
-                    self.message_entry.clear() 
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
+                self.append_to_chat_history("","Type")
+                self.message_entry.clear() 
 
 app = QApplication(sys.argv)
 window = ChatbotGUI()
