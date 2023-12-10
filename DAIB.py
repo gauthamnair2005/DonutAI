@@ -93,10 +93,10 @@ class ChatbotGUI(QWidget):
                         background: white;
                         border-radius: 0.4em;
                         color: black;
-                        padding: 10px;
+                        padding: 5px;
                         display: inline-block;
-                        margin: 10px;
-                        margin-bottom: 15px;
+                        margin: 5px;
+                        margin-bottom: 5px;
                         float: left;
                         clear: both;
                         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
