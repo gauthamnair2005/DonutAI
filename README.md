@@ -1,3 +1,3 @@
 # DonutAI
 DonutAI Assistant
-Based on DonutLLM 6
+Based on Google Gemini Pro
