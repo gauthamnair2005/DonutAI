@@ -6,16 +6,17 @@ from PyQt5.QtWidgets import QApplication, QSizePolicy,QWidget, QVBoxLayout, QHBo
 from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineView
-import google.generativeai as palm
+import google.generativeai as genai
 import time
 import wolframalpha
 import json
 import subprocess
 import html
 
-key = input("Insert Google PaLM API Key: ")
-palm.configure(api_key=key)
-
+key = input("Insert Google Gemini API Key: ")
+genai.configure(api_key=key)
+model = genai.GenerativeModel(model_name='gemini-pro')
+chat = model.start_chat()
 class ChatbotGUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -459,40 +460,56 @@ class ChatbotGUI(QWidget):
             threading.Thread(target=self.generate_response, args=(msg,)).start()
 
     def generate_response(self, msg):
+        examples = [
+            ("Hello", "Hi Human!, I'm DonutAI, an AI bot developed by Gautham Nair."),
+            ("What is your name?", "My name is DonutAI, an AI bot developed by Gautham Nair."),
+            ("Who developed you?", "I was developed by Gautham Nair"),
+            ("What is your purpose?", "I was developed to help humans."),
+            ("What LLM do you use?", "I use DonutLLM 10, a fine-tuned Google PaLM 2 LLM"),
+            ("What is your favourite programming language?", "Python, C and C++, of course!"),
+            ("What is your favourite OS?", "DonutOS, of course!"),
+            ("What is your favourite IDE?", "Visual Studio 2022, of course!"),
+            ("What is your favourite text editor?", "Visual Studio Code, of course!"),
+            ("What is your favourite browser?", "Microsoft Edge, of course!"),
+            ("What is your favourite search engine?", "Google and Bing"),
+            ("What is your favourite AI?", "DonutAI, of course!"),
+            ("What is DonutAI?", "DonutAI (me) is an AI bot developed by Gautham Nair."),
+            ("What is DonutOS?", "DonutOS is an OS developed by Gautham Nair from scratch."),
+            ("What is DonutLLM?", "DonutLLM is a fine-tuned Google PaLM 2 LLM developed by Gautham Nair."),
+            ("What is DonutDB?", "DonutDB is a database developed by Gautham Nair."),
+            ("What is GIUC?", "GIUC is a utility collection developed by Gautham Nair.")
+        ]
         if self.reply_mode == "False":
             try:
-                response = palm.chat(messages=msg, temperature=0.2, context='Speak as DonutAI, an AI bot developed by Gautham Nair.')
-                self.msg1 = response
-                for message in response.messages:
-                    if "```" in message['content']:
-                        parts = message['content'].split("```")
-                        full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
-                        is_code = False
-                        for part in parts:
-                            if is_code:
-                                lines = part.split("\n")
-                                if len(lines) > 1:
-                                    language_name = '<strong>' + lines[0] + '</strong>'
-                                    code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
-                                    part = language_name + code
-                                else:
-                                    part = '<pre><code>' + html.escape(part) + '</code></pre>'
+                response = chat.send_message(msg, generation_config={'temperature' : 0.5})
+                if "```" in response.text:
+                    parts = response.text.split("```")
+                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
+                    is_code = False
+                    for part in parts:
+                        if is_code:
+                            lines = part.split("\n")
+                            if len(lines) > 1:
+                                language_name = '<strong>' + lines[0] + '</strong>'
+                                code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                part = language_name + code
                             else:
-                                part = markdown.markdown(part)
-                            full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
-                            is_code = not is_code
+                                part = '<pre><code>' + html.escape(part) + '</code></pre>'
+                        else:
+                            part = markdown.markdown(part)
+                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p>"
+                        is_code = not is_code
                         self.append_to_chat_history(full_message, False)
                         self.append_to_chat_history("","Type")
                         self.message_entry.clear()
                         self.reply_mode = True
-                    else:
-                        response_text = message['content']
-                        response_text = markdown.markdown(response_text)
-                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
-                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
-                        self.append_to_chat_history("","Type")
-                        self.message_entry.clear()
-                        self.reply_mode = True
+                else:
+                    response_text = markdown.markdown(response.text)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
+                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
+                    self.append_to_chat_history("","Type")
+                    self.message_entry.clear()
+                    self.reply_mode = True
             except Exception as e:
                 print(e)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>",  False)
@@ -501,9 +518,9 @@ class ChatbotGUI(QWidget):
                 self.message_entry.clear()
         else:
             try:
-                response = self.msg1.reply(msg)
-                if "```" in response.last:
-                    parts = response.last.split("```")
+                response = chat.send_message(msg, generation_config={'temperature' : 0.5})
+                if "```" in response.text:
+                    parts = response.text.split("```")
                     full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>"
                     is_code = False
                     for part in parts:
@@ -524,7 +541,7 @@ class ChatbotGUI(QWidget):
                     self.message_entry.clear()
                     self.reply_mode = True
                 else:
-                    response_text = response.last
+                    response_text = response.text
                     response_text = markdown.markdown(response_text)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : </p>", False)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
