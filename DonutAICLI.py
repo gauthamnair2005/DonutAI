@@ -33,8 +33,9 @@ questions = [
         ]
     }
 ]
-model_id="models/chat-bison-001"
-llm=GooglePalm(google_api_key="API")
+model_id="models/gemini-pro"
+API = input("Enter your Google API Key: ")
+llm=GooglePalm(google_api_key=API)
 llm.temperature=0.7
 
 print("DonutAI PREVIEW v2")
