@@ -240,12 +240,10 @@ class ChatbotGUI(QWidget):
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response+"</p>", False)
             self.append_to_chat_history("","Type")
-            self.message_entry.clear()
         except:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>/!\ Could not give response </p>", "Error")
             self.append_to_chat_history("","Type")
-            self.message_entry.clear()
 
 
     def record_and_process(self):
@@ -261,8 +259,8 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("", False)
                 return
             elif 'weather' in msg:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>You : </p>", True)
+                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
@@ -325,7 +323,7 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("","Type")
             else:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
                 self.append_to_chat_history("","Type")
@@ -433,7 +431,7 @@ class ChatbotGUI(QWidget):
             self.message_entry.clear()
         else:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
             self.append_to_chat_history("","Type")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
             self.append_to_chat_history("","Type")
@@ -442,31 +440,12 @@ class ChatbotGUI(QWidget):
             self.message_entry.clear()
 
     def generate_response(self, msg):
-        examples = [
-            ("Hello", "Hi Human!, I'm DonutAI, an AI bot developed by Gautham Nair."),
-            ("What is your name?", "My name is DonutAI, an AI bot developed by Gautham Nair."),
-            ("Who developed you?", "I was developed by Gautham Nair"),
-            ("What is your purpose?", "I was developed to help humans."),
-            ("What LLM do you use?", "I use DonutLLM 10, a fine-tuned Google PaLM 2 LLM"),
-            ("What is your favourite programming language?", "Python, C and C++, of course!"),
-            ("What is your favourite OS?", "DonutOS, of course!"),
-            ("What is your favourite IDE?", "Visual Studio 2022, of course!"),
-            ("What is your favourite text editor?", "Visual Studio Code, of course!"),
-            ("What is your favourite browser?", "Microsoft Edge, of course!"),
-            ("What is your favourite search engine?", "Google and Bing"),
-            ("What is your favourite AI?", "DonutAI, of course!"),
-            ("What is DonutAI?", "DonutAI (me) is an AI bot developed by Gautham Nair."),
-            ("What is DonutOS?", "DonutOS is an OS developed by Gautham Nair from scratch."),
-            ("What is DonutLLM?", "DonutLLM is a fine-tuned Google PaLM 2 LLM developed by Gautham Nair."),
-            ("What is DonutDB?", "DonutDB is a database developed by Gautham Nair."),
-            ("What is GIUC?", "GIUC is a utility collection developed by Gautham Nair.")
-        ]
         if self.reply_mode == "False":
             try:
                 response = chat.send_message(msg, generation_config={'temperature' : 0.5})
                 if "```" in response.text:
                     parts = response.text.split("```")
-                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>"
+                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
                     is_code = False
                     for part in parts:
                         if is_code:
@@ -500,7 +479,7 @@ class ChatbotGUI(QWidget):
                 response = chat.send_message(msg, generation_config={'temperature' : 0.5})
                 if "```" in response.text:
                     parts = response.text.split("```")
-                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>"
+                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
                     is_code = False
                     for part in parts:
                         if is_code:
