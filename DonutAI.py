@@ -2,7 +2,7 @@ import sys
 import threading
 import markdown
 import speech_recognition as sr
-from PyQt5.QtWidgets import QApplication, QSizePolicy,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel
+from PyQt5.QtWidgets import QApplication, QSizePolicy,QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QTextEdit, QLabel
 from PyQt5.QtGui import QIcon, QPixmap, QTextDocument
 from PyQt5.QtCore import Qt
 from PyQt5.QtWebEngineWidgets import QWebEngineView
@@ -44,7 +44,9 @@ class ChatbotGUI(QWidget):
                         clear: both;
                         box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
                     }
-
+                    .user-bubble .text {
+                        text-align: left;
+                    }
                     .user-bubble:after {
                         content: '';
                         position: absolute;
@@ -158,7 +160,7 @@ class ChatbotGUI(QWidget):
         
         self.msg1 = None
 
-        self.message_entry = QLineEdit()
+        self.message_entry = QTextEdit()
         self.send_button = QPushButton()
         self.send_button.setIcon(QIcon('send.png'))
         self.send_button.setStyleSheet("QPushButton {background-color: #8E4684; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
@@ -181,7 +183,7 @@ class ChatbotGUI(QWidget):
         self.message_entry.setStyleSheet("font-size: 15px; color: white; background-color: #2D2D2D;")
 
         self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-
+        self.message_entry.setFixedHeight(60)
         # Set the size policy of the prompt box
         self.message_entry.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
@@ -216,7 +218,7 @@ class ChatbotGUI(QWidget):
     def append_to_chat_history(self, text, is_user_message):
         plain_text = QTextDocument(text).toPlainText()
         if is_user_message == True:
-            escaped_text = json.dumps("<div class='user-bubble'>" + plain_text + "</div><br>")
+            escaped_text = json.dumps("<div class='user-bubble text'>" + plain_text + "</div><br>")
         elif is_user_message == False:
             escaped_text = json.dumps("<div class='ai-bubble'>" + plain_text + "</div><br>")
         elif is_user_message == "Error":
@@ -257,7 +259,7 @@ class ChatbotGUI(QWidget):
                 return
             elif 'weather' in msg:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
@@ -333,7 +335,7 @@ class ChatbotGUI(QWidget):
                 self.message_entry.clear()
             else:
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
                 self.append_to_chat_history("","Type")
@@ -354,7 +356,9 @@ class ChatbotGUI(QWidget):
         threading.Thread(target=self.record_and_process).start()
     
     def send(self):
-        msg = self.message_entry.text()
+        msg = self.message_entry.toPlainText()
+        msg = html.escape(msg)
+        msg = msg.replace('\n','<br>')
         if msg == "":
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",False)
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Prompt cannot be empty.</p>", "Error")
@@ -363,7 +367,7 @@ class ChatbotGUI(QWidget):
             return
         elif 'weather' in msg:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
             self.append_to_chat_history("","Type")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
@@ -440,12 +444,13 @@ class ChatbotGUI(QWidget):
             self.message_entry.clear()
         else:
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
+            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
             self.append_to_chat_history("","Type")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             threading.Thread(target=self.generate_response, args=(msg,)).start()
+            self.message_entry.clear()
 
     def generate_response(self, msg):
         examples = [
@@ -489,14 +494,12 @@ class ChatbotGUI(QWidget):
                         is_code = not is_code
                         self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+full_message+"</p>", False)
                         self.append_to_chat_history("","Type")
-                        self.message_entry.clear()
                         self.reply_mode = True
                 else:
                     response_text = markdown.markdown(response.text)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
                     self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
                     self.reply_mode = True
             except Exception as e:
                 print(e)
@@ -526,7 +529,6 @@ class ChatbotGUI(QWidget):
                         is_code = not is_code
                     self.append_to_chat_history(full_message, False)
                     self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
                     self.reply_mode = True
                 else:
                     response_text = response.text
@@ -534,7 +536,6 @@ class ChatbotGUI(QWidget):
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
                     self.append_to_chat_history("","Type")
-                    self.message_entry.clear()
                     self.reply_mode = True
                 self.msg1 = response
             except Exception as e:
@@ -542,7 +543,6 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
                 self.append_to_chat_history("","Type")
-                self.message_entry.clear() 
 
 app = QApplication(sys.argv)
 window = ChatbotGUI()
