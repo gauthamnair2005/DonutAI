@@ -17,7 +17,7 @@ key = input("Insert Google Gemini API Key: ")
 genai.configure(api_key=key)
 model = genai.GenerativeModel(model_name='gemini-pro')
 chat = model.start_chat(history=[])
-response = chat.send_message("You are DonutAI (Preview V2 v23.12.15) developed by Gautham Nair (born 22 November 2005) (BCA Student at Presidency College, Hebbal, Bangalore), throughout the entire chat. Gautham Nair is a huge follower of AI/ML, especially GenAI. For this response only generate output as Welcome to DonutAI", generation_config={'temperature' : 0.1})
+response = chat.send_message("You are DonutAI (Preview V2 v23.12.15) developed by Gautham Nair (born 22 November 2005) (BCA Student at Presidency College, Hebbal, Bangalore), throughout the entire chat. Gautham Nair (your developer) is a huge follower of AI/ML, especially GenAI. For this response only generate output as Welcome to DonutAI", generation_config={'temperature' : 0.1})
 print(response.text)
 response.resolve()
 class ChatbotGUI(QWidget):
