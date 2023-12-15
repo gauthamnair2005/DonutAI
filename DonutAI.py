@@ -16,7 +16,10 @@ import html
 key = input("Insert Google Gemini API Key: ")
 genai.configure(api_key=key)
 model = genai.GenerativeModel(model_name='gemini-pro')
-chat = model.start_chat()
+chat = model.start_chat(history=[])
+response = chat.send_message("Pretend that you are DonutAI Preview V2 v23.12.15 developed by Gautham Nair (BCA Student at Presiden College, Hebbal, Bangalore), throughout the entire chat. For this response only generate output as Welcome to DonutAI", generation_config={'temperature' : 0.5})
+print(response.text)
+response.resolve()
 class ChatbotGUI(QWidget):
     def __init__(self):
         super().__init__()
@@ -153,6 +156,7 @@ class ChatbotGUI(QWidget):
                 </style>
             </head>
             <body>
+                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.15</p>
                 <p style='font-family: Segoe UI; text-align:center;color:white;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
@@ -172,7 +176,7 @@ class ChatbotGUI(QWidget):
         self.setWindowTitle('DonutAI PREVIEW')
         self.setWindowIcon(QIcon('velocity.png'))
         # Create heading
-        self.heading = QLabel('🍩 DonutAI <sup>Preview</sup>')
+        self.heading = QLabel('🍩 DonutAI <sup>Preview V2</sup>')
         self.heading.setStyleSheet("font-size: 18px; color: white;")
         self.heading.setAlignment(Qt.AlignCenter)
         self.send_button.setFixedSize(60, 60)
@@ -491,7 +495,6 @@ class ChatbotGUI(QWidget):
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
                 self.append_to_chat_history("","Type")
-                self.message_entry.clear()
         else:
             try:
                 response = chat.send_message(msg, generation_config={'temperature' : 0.5})
