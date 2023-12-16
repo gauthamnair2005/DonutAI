@@ -147,16 +147,65 @@ class ChatbotGUI(QWidget):
                         margin-top: -10px;
                         margin-left: -20px;
                     }
+                    .code {
+                        position: relative;
+                         background: linear-gradient(to right, #3a3a3a, #0a0a0a);
+                        border-radius: 0.5em;
+                        color: white;
+                        padding: 10px;
+                        display: inline-block;
+                        margin: 10px;
+                        margin-bottom: 15px;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+                    }
+                    .code:after {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 50%;
+                        width: 0;
+                        height: 0;
+                        border: 20px solid transparent;
+                        border-right-color: #f0f0f0;
+                        border-left: 0;
+                        border-right: 0;
+                        margin-top: -10px;
+                        margin-left: -20px;
+                    }
                     body {
                         font-family: Segoe UI;
                         font-size: 16px;
                         color: black;
                         background: radial-gradient(circle,black,#202020);
                     }
+                    button {
+                        background: radial-gradient(circle,blue,purple);
+                        border: none;
+                        color: white;
+                        padding: 10px 20px;
+                        text-align: center;
+                        text-decoration: none;
+                        display: inline-block;
+                        font-size: 16px;
+                        margin: 4px 2px;
+                        cursor: pointer;
+                        border-radius: 1em;
+                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
+                    }
                 </style>
+                <script>
+                function copyToClipboard(elementId) {
+                    var aux = document.createElement("input");
+                    aux.setAttribute("value", document.getElementById(elementId).innerText);
+                    document.body.appendChild(aux);
+                    aux.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(aux);
+                }
+                </script>
             </head>
             <body>
-                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.15</p>
+                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.16</p>
                 <p style='font-family: Segoe UI; text-align:center;color:white;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
@@ -483,24 +532,26 @@ class ChatbotGUI(QWidget):
                                 language_name = language_name.replace("groovy","Groovy")
                                 language_name = language_name.replace("ocaml","OCaml")
                                 language_name = language_name.replace("erlang","Erlang")
-                                language_name = language_name.replace("fortran","Fortran")
-                                code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                language_name = language_name.replace("fortran","Fortran")                               
+                                code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
                                 part = language_name + code
                             else:
                                 part = '<pre><code>' + html.escape(part) + '</code></pre>'
                         else:
                             part = markdown.markdown(part)
-                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p>"
+                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
                         is_code = not is_code
-                        self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+full_message+"</p>", False)
-                        self.append_to_chat_history("","Type")
-                        self.reply_mode = True
+                    self.append_to_chat_history(full_message, False)
+                    self.append_to_chat_history("","Type")
+                    self.reply_mode = True
                 else:
-                    response_text = markdown.markdown(response.text)
+                    response_text = response.text
+                    response_text = markdown.markdown(response_text)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
                     self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
                     self.append_to_chat_history("","Type")
                     self.reply_mode = True
+                self.msg1 = response
             except Exception as e:
                 print(e)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
@@ -550,13 +601,13 @@ class ChatbotGUI(QWidget):
                                 language_name = language_name.replace("ocaml","OCaml")
                                 language_name = language_name.replace("erlang","Erlang")
                                 language_name = language_name.replace("fortran","Fortran")                               
-                                code = '<pre><code>' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                                code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
                                 part = language_name + code
                             else:
                                 part = '<pre><code>' + html.escape(part) + '</code></pre>'
                         else:
                             part = markdown.markdown(part)
-                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p>"
+                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
                         is_code = not is_code
                     self.append_to_chat_history(full_message, False)
                     self.append_to_chat_history("","Type")
