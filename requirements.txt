@@ -1,0 +1,5 @@
+speechRecognition
+PyQt5
+PyQTWebEngine
+google-generativeai
+wolframalpha
