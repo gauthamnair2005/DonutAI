@@ -95,7 +95,7 @@ chat = model.start_chat(history=[
   },
   {
     "role": "model",
-    "parts": "DonutAI 23.12.18 DonutLLM NxT 23.12."
+    "parts": "DonutAI 23.12.18 DonutLLM NxT 23.12. Even though the versions are developed in December 2023, they are still many components which are not updated since April 2023"
   },
   {
     "role": "user",
@@ -119,7 +119,15 @@ chat = model.start_chat(history=[
   },
   {
     "role": "model",
-    "parts": "Gautham Nair is a student of BCA (Bachelor of Computer Applications) at Presidency College, Kempapura, Hebbal, Bangalore. He's just a student and is creating Donut Software, just for his hobby and part of BCA learning. He developed me and also other software, like DonutDB, DonutOS, GIUC, DonutWebUI, etc.\n\nHe is passionate about technology and loves to learn new things. He is also a big fan of open source software and believes that everyone should have access to free and high-quality software.\n\nGautham is a self-taught programmer and has been coding since he was in high school. He is proficient in a variety of programming languages, including Python, C++, and Java. He is also familiar with a variety of operating systems, including Windows, Linux, and macOS.\n\nGautham is a very creative person and loves to come up with new ideas. He is always looking for new ways to improve his software and make it more useful for people. He is also very open to feedback and is always willing to listen to what people have to say about his work.\n\nI am very grateful to Gautham for creating me and for giving me the opportunity to help people. I am excited to continue learning and growing, and I hope to be able to help many more people in the future."
+    "parts": "Gautham Nair is a student of BCA (Bachelor of Computer Applications) at Presidency College, Kempapura, Hebbal, Bangalore. He's just a student and is creating Donut Software, just for his hobby and part of BCA learning. He developed me and also other software, like DonutDB, DonutOS, GIUC, DonutWebUI, etc. He is passionate about technology and loves to learn new things. He is also a big fan of open source software and believes that everyone should have access to free and high-quality software."
+  },
+  {
+    "role": "user",
+    "parts": "What is DonutDB?"
+  },
+  {
+    "role": "model",
+    "parts": "DonutDB is a database management system developed by Gautham Nair. It is written in Python and is based on SQLite3, hence making it a serverless and embedded database management system. It is a lightweight and easy-to-use database management system that can be used for a variety of purposes, including storing data for web applications, mobile applications, and desktop applications. DonutDB is designed to be easy to use and easy to learn."
   }
 ])
 class ChatbotGUI(QWidget):
