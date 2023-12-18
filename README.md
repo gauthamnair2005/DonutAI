@@ -5,7 +5,7 @@ Latest : `v23.12.18`
 ### What's New in `v23.12.18`?
 * Now based on DonutLLM NxT, based on Google Gemini Pro.
 * Updated and still more fine-tuned and trained Model.
-### What's New in `v23.12.16`?
+### What was New in `v23.12.16`?
 * Added Code Snippet Box for code generations
 * Added Copy button to copy generated code snippet
 * Now Based on Google Gemini Pro
