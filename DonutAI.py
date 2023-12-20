@@ -15,7 +15,33 @@ import html
 
 key = input("Insert Google Gemini API Key: ")
 genai.configure(api_key=key)
-model = genai.GenerativeModel(model_name='gemini-pro')
+safety_settings = [
+  {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  }
+]
+generation_config = {
+  "temperature": 0.9,
+  "top_p": 1,
+  "top_k": 1,
+  "max_output_tokens": 2048,
+}
+model = genai.GenerativeModel(model_name="gemini-pro",
+                              generation_config=generation_config,
+                              safety_settings=safety_settings)
 chat = model.start_chat(history=[
   {
     "role": "user",
@@ -23,111 +49,7 @@ chat = model.start_chat(history=[
   },
   {
     "role": "model",
-    "parts": "Hi, I'm DonutAI, an AI assistant developed by Gautham Nair."
-  },
-  {
-    "role": "user",
-    "parts": "Who is Gautham Nair?"
-  },
-  {
-    "role": "model",
-    "parts": "Gautham Nair (born 22 November 2005), is a student of BCA (Bachelor of Computer Applications) at Presidency College, Kempapura, Hebbal, Bangalore. He's just a student and is creating Donut Software, just for his hobby and part of BCA learning. He developed me and also other software, like DonutDB, DonutOS, GIUC, DonutWebUI, etc."
-  },
-  {
-    "role": "user",
-    "parts": "What is GIUC?"
-  },
-  {
-    "role": "model",
-    "parts": "GIUC stands for Gautham's Important Utility Collection, it a utility suite developed by Gautham Nair, which is written in C."
-  },
-  {
-    "role": "user",
-    "parts": "What all can you do?"
-  },
-  {
-    "role": "model",
-    "parts": "Well as of now, I can generate essays, poems, song lyrics, stories, play few games, generate code, help you with grammar, etc."
-  },
-  {
-    "role": "user",
-    "parts": "What LLM do you use?"
-  },
-  {
-    "role": "model",
-    "parts": "Fine-tuned Google Gemini Pro, called DonutLLM NxT, developed by Gautham Nair. It is based on Google Gemini Pro"
-  },
-  {
-    "role": "user",
-    "parts": "Can you generate image, video or audio?"
-  },
-  {
-    "role": "model",
-    "parts": "No, as of now I'm not capable of doing so, however I can chat with you with continuations, I'm still in preview, so I might make few mistakes."
-  },
-  {
-    "role": "user",
-    "parts": "What is your knowledge cut-off?"
-  },
-  {
-    "role": "model",
-    "parts": "My main base knowledge cut-off is of April 2023, however for a few stuffs, my cut-off is December 2023."
-  },
-  {
-    "role": "user",
-    "parts": "What distro is DonutOS based on?"
-  },
-  {
-    "role": "model",
-    "parts": "DonutOS is developed from scratch and is not made on top of any other Linux distro."
-  },
-  {
-    "role": "user",
-    "parts": "Is DonutOS Linux?"
-  },
-  {
-    "role": "model",
-    "parts": "Yes, DonutOS is always built on latest kernel."
-  },
-  {
-    "role": "user",
-    "parts": "What is your version?"
-  },
-  {
-    "role": "model",
-    "parts": "DonutAI 23.12.18 DonutLLM NxT 23.12. Even though the versions are developed in December 2023, they are still many components which are not updated since April 2023"
-  },
-  {
-    "role": "user",
-    "parts": "Hello"
-  },
-  {
-    "role": "model",
-    "parts": "Hi again! Is there anything specific you'd like to ask or discuss? I'm here to help in any way I can. Whether you have questions about the world, need assistance with a task, or just want to chat, I'm here for you. You can ask me about anything, and I'll do my best to provide accurate and informative responses."
-  },
-  {
-    "role": "user",
-    "parts": "Who are you?"
-  },
-  {
-    "role": "model",
-    "parts": "I am DonutAI, an AI assistant developed by Gautham Nair. I am designed to help people with a wide range of tasks, including answering questions, providing information, and generating creative content. I am still under development, but I am learning and improving every day.\n\nHere are some of my key features:\n\n* **Language understanding:** I am able to understand and respond to natural language input. This means that you can ask me questions or give me commands in a way that is similar to how you would speak to another person.\n* **Knowledge base:** I have access to a large and diverse knowledge base, which allows me to answer a wide range of questions on a variety of topics.\n* **Creativity:** I am able to generate creative content, such as stories, poems, and songs.\n* **Personalization:** I am able to learn about your preferences and interests over time, which allows me to provide you with more personalized responses.\n\nI am excited to continue learning and growing, and I hope to be able to help you with a wide range of tasks in the future."
-  },
-  {
-    "role": "user",
-    "parts": "Who is Gautham Nair?"
-  },
-  {
-    "role": "model",
-    "parts": "Gautham Nair is a student of BCA (Bachelor of Computer Applications) at Presidency College, Kempapura, Hebbal, Bangalore. He's just a student and is creating Donut Software, just for his hobby and part of BCA learning. He developed me and also other software, like DonutDB, DonutOS, GIUC, DonutWebUI, etc. He is passionate about technology and loves to learn new things. He is also a big fan of open source software and believes that everyone should have access to free and high-quality software."
-  },
-  {
-    "role": "user",
-    "parts": "What is DonutDB?"
-  },
-  {
-    "role": "model",
-    "parts": "DonutDB is a database management system developed by Gautham Nair. It is written in Python and is based on SQLite3, hence making it a serverless and embedded database management system. It is a lightweight and easy-to-use database management system that can be used for a variety of purposes, including storing data for web applications, mobile applications, and desktop applications. DonutDB is designed to be easy to use and easy to learn."
+    "parts": "Hi, I'm DonutAI, a chatbot developed by Gautham Nair (born 22 November 2005), Gautham Nair is a BCA Student at Presidency College Bangalore."
   }
 ])
 class ChatbotGUI(QWidget):
@@ -315,7 +237,7 @@ class ChatbotGUI(QWidget):
                 </script>
             </head>
             <body>
-                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.18</p>
+                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.20</p>
                 <p style='font-family: Segoe UI; text-align:center;color:white;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
@@ -599,142 +521,73 @@ class ChatbotGUI(QWidget):
             self.message_entry.clear()
 
     def generate_response(self, msg):
-        if self.reply_mode == "False":
-            try:
-                response = chat.send_message(msg, generation_config={'temperature' : 0.5})
-                if "```" in response.text:
-                    parts = response.text.split("```")
-                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
-                    is_code = False
-                    for part in parts:
-                        if is_code:
-                            lines = part.split("\n")
-                            if len(lines) > 1:
-                                language_name = '<strong>' + lines[0] + '</strong>'
-                                language_name = language_name.replace("c++","C++")
-                                language_name = language_name.replace("c#","C#")
-                                language_name = language_name.replace("c","C")
-                                language_name = language_name.replace("python","Python")
-                                language_name = language_name.replace("java","Java")
-                                language_name = language_name.replace("javascript","JavaScript")
-                                language_name = language_name.replace("html","HTML")
-                                language_name = language_name.replace("css","CSS")
-                                language_name = language_name.replace("php","PHP")
-                                language_name = language_name.replace("sql","SQL")
-                                language_name = language_name.replace("ruby","Ruby")
-                                language_name = language_name.replace("perl","Perl")
-                                language_name = language_name.replace("bash","Bash")
-                                language_name = language_name.replace("r","R")
-                                language_name = language_name.replace("matlab","Matlab")
-                                language_name = language_name.replace("swift","Swift")
-                                language_name = language_name.replace("go","Go")
-                                language_name = language_name.replace("scala","Scala")
-                                language_name = language_name.replace("kotlin","Kotlin")
-                                language_name = language_name.replace("rust","Rust")
-                                language_name = language_name.replace("typescript","TypeScript")
-                                language_name = language_name.replace("dart","Dart")
-                                language_name = language_name.replace("haskell","Haskell")
-                                language_name = language_name.replace("lua","Lua")
-                                language_name = language_name.replace("julia","Julia")
-                                language_name = language_name.replace("coffeescript","CoffeeScript")
-                                language_name = language_name.replace("elixir","Elixir")
-                                language_name = language_name.replace("clojure","Clojure")
-                                language_name = language_name.replace("groovy","Groovy")
-                                language_name = language_name.replace("ocaml","OCaml")
-                                language_name = language_name.replace("erlang","Erlang")
-                                language_name = language_name.replace("fortran","Fortran")                               
-                                code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
-                                part = language_name + code
-                            else:
-                                part = '<pre><code>' + html.escape(part) + '</code></pre>'
+        try:
+            chat.send_message(msg)
+            print(chat.last.text)
+            if "```" in chat.last.text:
+                parts = chat.last.text.split("```")
+                full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
+                is_code = False
+                for part in parts:
+                    if is_code:
+                        lines = part.split("\n")
+                        if len(lines) > 1:
+                            language_name = '<strong>' + lines[0] + '</strong>'
+                            language_name = language_name.replace("c++","C++")
+                            language_name = language_name.replace("c#","C#")
+                            language_name = language_name.replace("c","C")
+                            language_name = language_name.replace("python","Python")
+                            language_name = language_name.replace("java","Java")
+                            language_name = language_name.replace("javascript","JavaScript")
+                            language_name = language_name.replace("html","HTML")
+                            language_name = language_name.replace("css","CSS")
+                            language_name = language_name.replace("php","PHP")
+                            language_name = language_name.replace("sql","SQL")
+                            language_name = language_name.replace("ruby","Ruby")
+                            language_name = language_name.replace("perl","Perl")
+                            language_name = language_name.replace("bash","Bash")
+                            language_name = language_name.replace("r","R")
+                            language_name = language_name.replace("matlab","Matlab")
+                            language_name = language_name.replace("swift","Swift")
+                            language_name = language_name.replace("go","Go")
+                            language_name = language_name.replace("scala","Scala")
+                            language_name = language_name.replace("kotlin","Kotlin")
+                            language_name = language_name.replace("rust","Rust")
+                            language_name = language_name.replace("typescript","TypeScript")
+                            language_name = language_name.replace("dart","Dart")
+                            language_name = language_name.replace("haskell","Haskell")
+                            language_name = language_name.replace("lua","Lua")
+                            language_name = language_name.replace("julia","Julia")
+                            language_name = language_name.replace("coffeescript","CoffeeScript")
+                            language_name = language_name.replace("elixir","Elixir")
+                            language_name = language_name.replace("clojure","Clojure")
+                            language_name = language_name.replace("groovy","Groovy")
+                            language_name = language_name.replace("ocaml","OCaml")
+                            language_name = language_name.replace("erlang","Erlang")
+                            language_name = language_name.replace("fortran","Fortran")                               
+                            code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
+                            part = language_name + code
                         else:
-                            part = markdown.markdown(part)
-                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
-                        is_code = not is_code
-                    self.append_to_chat_history(full_message, False)
-                    self.append_to_chat_history("","Type")
-                    self.reply_mode = True
-                else:
-                    response_text = response.text
-                    response_text = markdown.markdown(response_text)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
-                    self.append_to_chat_history("","Type")
-                    self.reply_mode = True
-                self.msg1 = response
-            except Exception as e:
-                print(e)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
+                            part = '<pre><code>' + html.escape(part) + '</code></pre>'
+                    else:
+                        part = markdown.markdown(part)
+                    full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
+                    is_code = not is_code
+                self.append_to_chat_history(full_message, False)
                 self.append_to_chat_history("","Type")
-        else:
-            try:
-                response = chat.send_message(msg, generation_config={'temperature' : 0.5})
-                if "```" in response.text:
-                    parts = response.text.split("```")
-                    full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
-                    is_code = False
-                    for part in parts:
-                        if is_code:
-                            lines = part.split("\n")
-                            if len(lines) > 1:
-                                language_name = '<strong>' + lines[0] + '</strong>'
-                                language_name = language_name.replace("c++","C++")
-                                language_name = language_name.replace("c#","C#")
-                                language_name = language_name.replace("c","C")
-                                language_name = language_name.replace("python","Python")
-                                language_name = language_name.replace("java","Java")
-                                language_name = language_name.replace("javascript","JavaScript")
-                                language_name = language_name.replace("html","HTML")
-                                language_name = language_name.replace("css","CSS")
-                                language_name = language_name.replace("php","PHP")
-                                language_name = language_name.replace("sql","SQL")
-                                language_name = language_name.replace("ruby","Ruby")
-                                language_name = language_name.replace("perl","Perl")
-                                language_name = language_name.replace("bash","Bash")
-                                language_name = language_name.replace("r","R")
-                                language_name = language_name.replace("matlab","Matlab")
-                                language_name = language_name.replace("swift","Swift")
-                                language_name = language_name.replace("go","Go")
-                                language_name = language_name.replace("scala","Scala")
-                                language_name = language_name.replace("kotlin","Kotlin")
-                                language_name = language_name.replace("rust","Rust")
-                                language_name = language_name.replace("typescript","TypeScript")
-                                language_name = language_name.replace("dart","Dart")
-                                language_name = language_name.replace("haskell","Haskell")
-                                language_name = language_name.replace("lua","Lua")
-                                language_name = language_name.replace("julia","Julia")
-                                language_name = language_name.replace("coffeescript","CoffeeScript")
-                                language_name = language_name.replace("elixir","Elixir")
-                                language_name = language_name.replace("clojure","Clojure")
-                                language_name = language_name.replace("groovy","Groovy")
-                                language_name = language_name.replace("ocaml","OCaml")
-                                language_name = language_name.replace("erlang","Erlang")
-                                language_name = language_name.replace("fortran","Fortran")                               
-                                code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
-                                part = language_name + code
-                            else:
-                                part = '<pre><code>' + html.escape(part) + '</code></pre>'
-                        else:
-                            part = markdown.markdown(part)
-                        full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
-                        is_code = not is_code
-                    self.append_to_chat_history(full_message, False)
-                    self.append_to_chat_history("","Type")
-                    self.reply_mode = True
-                else:
-                    response_text = response.text
-                    response_text = markdown.markdown(response_text)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                    self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
-                    self.append_to_chat_history("","Type")
-                    self.reply_mode = True
-                self.msg1 = response
-            except Exception as e:
-                print(e)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
+                self.reply_mode = True
+            else:
+                response_text = chat.last.text
+                response_text = markdown.markdown(response_text)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
                 self.append_to_chat_history("","Type")
+                self.reply_mode = True
+        except Exception as e:
+            print(e)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
+            self.append_to_chat_history("","Type")
 
 app = QApplication(sys.argv)
 window = ChatbotGUI()
