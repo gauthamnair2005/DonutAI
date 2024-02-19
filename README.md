@@ -1,7 +1,7 @@
 # DonutAI
 DonutAI Assistant Preview V2
 ## DonutAI GUI
-Latest : `v23.12.20`
+Latest : `v24.02.19`
 ### What's New in `v23.12.20`?
 * Update U-20231220
 * A crucial update fixing no spaces between words.

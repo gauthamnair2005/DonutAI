@@ -266,7 +266,7 @@ class ChatbotGUI(QWidget):
                 </script>
             </head>
             <body>
-                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>DonutAI Preview V2 v24.02.15</p>
+                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>DonutAI Preview V2 v24.02.19</p>
                 <p style='font-family: Segoe UI; text-align:center;color:bloack;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
