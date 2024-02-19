@@ -49,7 +49,7 @@ chat = model.start_chat(history=[
   },
   {
     "role": "model",
-    "parts": "Hi, I'm DonutAI, a chatbot developed by Gautham Nair (born 22 November 2005), Gautham Nair is a BCA Student at Presidency College Bangalore."
+    "parts": "Hi, I'm DonutAI, a chatbot developed by Gautham Nair."
   }
 ])
 class ChatbotGUI(QWidget):
@@ -59,25 +59,56 @@ class ChatbotGUI(QWidget):
         self.chat_history = QWebEngineView()
         self.setStyleSheet("""
             QWidget {
-                background: #202020;
+                background: white;
             }
         """)
         self.chat_history.setHtml("""
             <html>
             <head>
                 <style>
+                    #loading::after {
+                        content: '🍩';
+                        animation: dots 1s steps(5, end) infinite;
+                    }
+
+                    @keyframes dots {
+                        0%, 20% {
+                            color: rgba(0,0,0,0);
+                            text-shadow:
+                            .25em 0 0 rgba(0,0,0,0),
+                            .5em 0 0 rgba(0,0,0,0);
+                        }
+                        40% {
+                            color: white;
+                            text-shadow:
+                            .25em 0 0 rgba(0,0,0,0),
+                            .5em 0 0 rgba(0,0,0,0);
+                        }
+                        60% {
+                            text-shadow:
+                            .25em 0 0 white,
+                            .5em 0 0 rgba(0,0,0,0);
+                        }
+                        80%, 100% {
+                            text-shadow:
+                            .25em 0 0 white,
+                            .5em 0 0 white;
+                        }
+                    }
+                    body {
+                        font-family: "Segoe UI", Arial, sans-serif;
+                    }
                     .user-bubble {
                         position: relative;
-                        background: radial-gradient(circle, purple, blue);
+                        background: white;
                         border-radius: 1em;
-                        color: white;
+                        color: black;
                         padding: 10px;
                         display: inline-block;
                         margin: 10px;
                         margin-bottom: 15px;
                         float: right;
                         clear: both;
-                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
                     }
                     .user-bubble .text {
                         text-align: left;
@@ -99,16 +130,15 @@ class ChatbotGUI(QWidget):
 
                     .ai-bubble {
                         position: relative;
-                        background: radial-gradient(circle,blue,purple);
+                        background: #87CEFA;
                         border-radius: 1em;
-                        color: white;
+                        color: black;
                         padding: 10px;
                         display: inline-block;
                         margin: 10px;
                         margin-bottom: 15px;
                         float: left;
                         clear: both;
-                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);
                     }
 
                     .ai-bubble:after {
@@ -136,7 +166,7 @@ class ChatbotGUI(QWidget):
                         margin-bottom: 5px;
                         float: left;
                         clear: both;
-                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
+                        text-size : 10px;                                
                     }
                     .genmesage:after {
                         content: '';
@@ -162,8 +192,7 @@ class ChatbotGUI(QWidget):
                         margin: 10px;
                         margin-bottom: 15px;
                         float: left;
-                        clear: both;
-                        box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.2);                                 
+                        clear: both;                
                     }
                     .error:after {
                         content: '';
@@ -181,7 +210,7 @@ class ChatbotGUI(QWidget):
                     }
                     .code {
                         position: relative;
-                         background: linear-gradient(to right, #3a3a3a, #0a0a0a);
+                         background: black;
                         border-radius: 0.5em;
                         color: white;
                         padding: 10px;
@@ -208,10 +237,10 @@ class ChatbotGUI(QWidget):
                         font-family: Segoe UI;
                         font-size: 16px;
                         color: black;
-                        background: radial-gradient(circle,black,#202020);
+                        background: rwfite;
                     }
                     button {
-                        background: radial-gradient(circle,blue,purple);
+                        background: grey;
                         border: none;
                         color: white;
                         padding: 10px 20px;
@@ -237,8 +266,8 @@ class ChatbotGUI(QWidget):
                 </script>
             </head>
             <body>
-                <p style='font-family: Segoe UI; text-align:center;color:white;'>DonutAI Preview V2 v23.12.20</p>
-                <p style='font-family: Segoe UI; text-align:center;color:white;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
+                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>DonutAI Preview V2 v24.02.15</p>
+                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
         """)
@@ -248,24 +277,24 @@ class ChatbotGUI(QWidget):
         self.message_entry = QTextEdit()
         self.send_button = QPushButton()
         self.send_button.setIcon(QIcon('send.png'))
-        self.send_button.setStyleSheet("QPushButton {background-color: #8E4684; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        self.send_button.setStyleSheet("QPushButton {background-color: white; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
         self.voice_button = QPushButton()
         self.voice_button.setIcon(QIcon('voice.png'))
-        self.voice_button.setStyleSheet("QPushButton {background-color: #8E4684; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
+        self.voice_button.setStyleSheet("QPushButton {background-color: white; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
         
         # Set window title and icon
         self.setWindowTitle('DonutAI PREVIEW')
         self.setWindowIcon(QIcon('velocity.png'))
         # Create heading
         self.heading = QLabel('🍩 DonutAI <sup>Preview V2</sup>')
-        self.heading.setStyleSheet("font-size: 18px; color: white;")
+        self.heading.setStyleSheet("font-size: 18px; color: black;")
         self.heading.setAlignment(Qt.AlignCenter)
         self.send_button.setFixedSize(60, 60)
         self.voice_button.setFixedSize(60, 60)
 
         # Set styles
         self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: white;")
-        self.message_entry.setStyleSheet("font-size: 15px; color: white; background-color: #2D2D2D;")
+        self.message_entry.setStyleSheet("font-size: 15px; color: black; background-color: lightgray;")
 
         self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.message_entry.setFixedHeight(60)
@@ -309,7 +338,10 @@ class ChatbotGUI(QWidget):
         elif is_user_message == "Error":
             escaped_text = json.dumps("<div class='error'>" + plain_text + "</div><br>")
         else:
-            escaped_text = json.dumps("<div class='genmessage'>" + plain_text + "</div><br>")
+            if plain_text == "Random":
+                escaped_text = json.dumps("<div class='genmessage'><div id='loading'> " + plain_text + "</div></div><br>")
+            else:
+                escaped_text = json.dumps("<div class='genmessage'>" + plain_text + "</div><br>")
         self.chat_history.page().runJavaScript("document.body.innerHTML += " + escaped_text + ";")
         self.scroll_to_bottom()
 
@@ -318,12 +350,12 @@ class ChatbotGUI(QWidget):
             client = wolframalpha.Client('UL8UPY-4EHX5683WH')
             res = client.query(msg)
             response = next(res.results).text
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response+"</p>", False)
             self.append_to_chat_history("","Type")
         except:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>/!\ Could not give response </p>", "Error")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>/!\ Could not give response </p>", "Error")
             self.append_to_chat_history("","Type")
 
 
@@ -332,15 +364,15 @@ class ChatbotGUI(QWidget):
         with sr.Microphone() as source:
             audio = r.listen(source)
         try:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Recognizing..!</p>", "Random")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Recognizing..!</p>", "Listen")
             msg = r.recognize_google(audio)
             if msg == "":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",False)
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Prompt cannot be empty.</p>", "Error")
                 self.append_to_chat_history("", False)
                 return
             elif 'weather' in msg:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>You : </p>", True)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>You : </p>", True)
                 self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
@@ -349,73 +381,73 @@ class ChatbotGUI(QWidget):
                 threading.Thread(target=self.wolf, args=(msg,)).start()
             elif msg == "Whats is time" or msg == "What is time" or msg == "what is time" or msg == "whats is time":
                 strTime = time.strftime("%H:%M:%S")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The time is "+strTime+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
                 strDate = time.strftime("%d/%m/%Y")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The date is "+strDate+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
                 strDay = time.strftime("%A")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The day is "+strDay+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
                 strMonth = time.strftime("%B")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The month is "+strMonth+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
                 strYear = time.strftime("%Y")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The year is "+strYear+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
                 strHour = time.strftime("%H")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The hour is "+strHour+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
                 strMinute = time.strftime("%M")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The minute is "+strMinute+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
                 strSecond = time.strftime("%S")
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The second is "+strSecond+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
                 self.append_to_chat_history("","Type")
             elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Logging off your PC!</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
                 self.append_to_chat_history("","Type")
                 subprocess.call(["shutdown", "/l"])
             elif msg == "restart" or msg == "Restart":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Restarting your PC!</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Restarting your PC!</p>", False)
                 self.append_to_chat_history("","Type")
                 subprocess.call(["shutdown", "/r"])
             elif msg == "shutdown" or msg == "Shutdown":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Shutting down your PC!</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Shutting down your PC!</p>", False)
                 self.append_to_chat_history("","Type")
                 subprocess.call(["shutdown", "/s"])
             elif msg == "exit":
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
                 self.append_to_chat_history("","Type")
             else:
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:black;'>You : </p>", True)
+                self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:black;'>"+msg+"</p>", True)
                 self.append_to_chat_history("","Type")
                 self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
                 self.append_to_chat_history("","Type")
                 threading.Thread(target=self.generate_response, args=(msg,)).start()
         except sr.UnknownValueError:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
             return ""
         except sr.RequestError as e:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Sorry, I couldn't understand, or didnt hear what you said. Please try again!</p>", "Error")
             return ""
             
     def get_voice_input(self):
@@ -428,13 +460,13 @@ class ChatbotGUI(QWidget):
         msg = html.escape(msg)
         msg = msg.replace('\n','<br>')
         if msg == "":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Prompt cannot be empty.</p>", "Error")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Prompt cannot be empty.</p>", "Error")
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             return
         elif 'weather' in msg:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:black;'>You : </p>", True)
             self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:right;color:white;'>"+msg+"</p>", True)
             self.append_to_chat_history("","Type")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Fatching Latest Weather..!</p>", "Random")
@@ -444,75 +476,75 @@ class ChatbotGUI(QWidget):
             threading.Thread(target=self.wolf, args=(msg,)).start()
         elif msg == "Whats is time" or msg == "What is time" or msg == "what is time" or msg == "whats is time":
             strTime = time.strftime("%H:%M:%S")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The time is "+strTime+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The time is "+strTime+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is date" or msg == "What is date" or msg == "what is date" or msg == "whats is date":
             strDate = time.strftime("%d/%m/%Y")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The date is "+strDate+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The date is "+strDate+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is day" or msg == "What is day" or msg == "what is day" or msg == "whats is day":
             strDay = time.strftime("%A")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The day is "+strDay+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The day is "+strDay+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is month" or msg == "What is month" or msg == "what is month" or msg == "whats is month":
             strMonth = time.strftime("%B")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The month is "+strMonth+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The month is "+strMonth+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is year" or msg == "What is year" or msg == "what is year" or msg == "whats is year":
             strYear = time.strftime("%Y")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The year is "+strYear+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The year is "+strYear+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is hour" or msg == "What is hour" or msg == "what is hour" or msg == "whats is hour":
             strHour = time.strftime("%H")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The hour is "+strHour+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The hour is "+strHour+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is minute" or msg == "What is minute" or msg == "what is minute" or msg == "whats is minute":
             strMinute = time.strftime("%M")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The minute is "+strMinute+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The minute is "+strMinute+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "Whats is second" or msg == "What is second" or msg == "what is second" or msg == "whats is second":
             strSecond = time.strftime("%S")
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",   False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>The second is "+strSecond+"</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",   False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>The second is "+strSecond+"</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         elif msg == "log off" or msg == "Log off" or msg == "Log Off" or msg == "log Off" or msg == "Log Off" or msg == "log off":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Logging off your PC!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Logging off your PC!</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             subprocess.call(["shutdown", "/l"])
         elif msg == "restart" or msg == "Restart":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Restarting your PC!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Restarting your PC!</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             subprocess.call(["shutdown", "/r"])
         elif msg == "shutdown" or msg == "Shutdown":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Shutting down your PC!</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Shutting down your PC!</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
             subprocess.call(["shutdown", "/s"])
 
         elif msg == "exit":
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : Bye! You can press the 'X' or close button to close the window.</p>", False)
             self.append_to_chat_history("","Type")
             self.message_entry.clear()
         else:
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:white;'>You : </p>", True)
-            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:white;'>"+msg+"</p>", True)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:right;color:black;'>You : </p>", True)
+            self.append_to_chat_history("<p class='text' style='font-family: Segoe UI; text-align:left;color:black;'>"+msg+"</p>", True)
             self.append_to_chat_history("","Type")
             self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:center;color:green;'>Generating Answers..!</p>", "Random")
             self.append_to_chat_history("","Type")
@@ -526,7 +558,7 @@ class ChatbotGUI(QWidget):
             print(chat.last.text)
             if "```" in chat.last.text:
                 parts = chat.last.text.split("```")
-                full_message = "<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
+                full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
                 is_code = False
                 for part in parts:
                     if is_code:
@@ -564,14 +596,15 @@ class ChatbotGUI(QWidget):
                             language_name = language_name.replace("groovy","Groovy")
                             language_name = language_name.replace("ocaml","OCaml")
                             language_name = language_name.replace("erlang","Erlang")
-                            language_name = language_name.replace("fortran","Fortran")                               
+                            language_name = language_name.replace("fortran","Fortran")
+                            language_name = language_name.replace("assembly","Assembly")               
                             code = '<button onclick="copyToClipboard(\'code\')">Copy</button><pre id="code"><code class="code">' + html.escape('\n'.join(lines[1:])) + '</code></pre>'
                             part = language_name + code
                         else:
                             part = '<pre><code>' + html.escape(part) + '</code></pre>'
                     else:
                         part = markdown.markdown(part)
-                    full_message += "<p style='font-family: Segoe UI; text-align:left;color:white;'>"+part+"</p><br>"
+                    full_message += "<p style='font-family: Segoe UI; text-align:left;color:black;'>"+part+"</p><br>"
                     is_code = not is_code
                 self.append_to_chat_history(full_message, False)
                 self.append_to_chat_history("","Type")
@@ -579,14 +612,14 @@ class ChatbotGUI(QWidget):
             else:
                 response_text = chat.last.text
                 response_text = markdown.markdown(response_text)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>", False)
-                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>"+response_text+"</p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>", False)
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>"+response_text+"</p>", False)
                 self.append_to_chat_history("","Type")
                 self.reply_mode = True
         except Exception as e:
             print(e)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>DonutAI : </p>",  False)
-            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:white;'>Could not give response </p>", "Error")
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI : </p>",  False)
+            self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>Could not give response </p>", "Error")
             self.append_to_chat_history("","Type")
 
 app = QApplication(sys.argv)
