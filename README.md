@@ -1,12 +1,16 @@
 # DonutAI
 DonutAI Assistant Preview V2
 ## DonutAI GUI
-Latest : `v24.02.19`
-### What's New in 'v24.02.19'?
+Latest : `v24.03.16`
+### What's New in `v24.03.16`?
+* Update U-20240316.
+* UI Update.
+* Now uses Google Gemini 1.0 Pro.
+### What was New in `v24.02.19`?
 * Update U-20240219.
 * UI Update.
 * Fixed few bugs.
-### What's New in `v23.12.20`?
+### What was New in `v23.12.20`?
 * Update U-20231220.
 * A crucial update fixing no spaces between words.
 * Update Training Data.

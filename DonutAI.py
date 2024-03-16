@@ -39,7 +39,7 @@ generation_config = {
   "top_k": 1,
   "max_output_tokens": 2048,
 }
-model = genai.GenerativeModel(model_name="gemini-pro",
+model = genai.GenerativeModel(model_name="gemini-1.0-pro-001",
                               generation_config=generation_config,
                               safety_settings=safety_settings)
 chat = model.start_chat(history=[
@@ -266,7 +266,7 @@ class ChatbotGUI(QWidget):
                 </script>
             </head>
             <body>
-                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>DonutAI Preview V2 v24.02.19</p>
+                <p style='font-family: Segoe UI; text-align:center;color:bloack;'>DonutAI Preview V2 v24.03.16</p>
                 <p style='font-family: Segoe UI; text-align:center;color:bloack;'>Message from Developer (Gautham Nair), DonutAI is still in Preview, it might make mistakes</p>                      
             </body>
             </html>
@@ -275,13 +275,51 @@ class ChatbotGUI(QWidget):
         self.msg1 = None
 
         self.message_entry = QTextEdit()
-        self.send_button = QPushButton()
-        self.send_button.setIcon(QIcon('send.png'))
-        self.send_button.setStyleSheet("QPushButton {background-color: white; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
-        self.voice_button = QPushButton()
-        self.voice_button.setIcon(QIcon('voice.png'))
-        self.voice_button.setStyleSheet("QPushButton {background-color: white; border-radius: 10%; padding: 15px; font-size : 20px} QPushButton:pressed {background-color: white;}")
-        
+        self.send_button = QPushButton("👉")
+        self.send_button.setStyleSheet("""
+    QPushButton {
+        background-color: #4CAF50; /* Green */
+        border: none;
+        color: white;
+        padding: 15px;
+        font-size: 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 10%;
+    }
+    QPushButton:hover {
+        background-color: #45a049; /* Darker green */
+    }
+    QPushButton:pressed {
+        background-color: #3e8e41; /* Even darker green */
+    }
+""")
+        self.voice_button = QPushButton("🎤")
+        self.voice_button.setStyleSheet("""
+    QPushButton {
+        background-color: #008CBA; /* Blue */
+        border: none;
+        color: white;
+        padding: 15px;
+        font-size: 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 10%;
+    }
+    QPushButton:hover {
+        background-color: #007B9E; /* Darker blue */
+    }
+    QPushButton:pressed {
+        background-color: #006885; /* Even darker blue */
+    }
+""")
+
         # Set window title and icon
         self.setWindowTitle('DonutAI PREVIEW')
         self.setWindowIcon(QIcon('velocity.png'))
@@ -294,7 +332,16 @@ class ChatbotGUI(QWidget):
 
         # Set styles
         self.chat_history.setStyleSheet("font-size: 20px; color: blue; background-color: white;")
-        self.message_entry.setStyleSheet("font-size: 15px; color: black; background-color: lightgray;")
+        self.message_entry.setStyleSheet("""
+                QTextEdit {
+                    background-color: lightgray;
+                    color: black;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 15px;
+                    font-size: 16px;
+                }
+            """)
 
         self.chat_history.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.message_entry.setFixedHeight(60)
