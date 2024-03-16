@@ -103,10 +103,10 @@ class ChatbotGUI(QWidget):
                         background: white;
                         border-radius: 1em;
                         color: black;
-                        padding: 10px;
+                        padding: 5px;
                         display: inline-block;
-                        margin: 10px;
-                        margin-bottom: 15px;
+                        margin: 5px;
+                        margin-bottom: 0px;
                         float: right;
                         clear: both;
                     }
@@ -120,23 +120,23 @@ class ChatbotGUI(QWidget):
                         top: 50%;
                         width: 0;
                         height: 0;
-                        border: 20px solid transparent;
+                        border: 10px solid transparent;
                         border-left-color: #0084ff;
                         border-right: 0;
                         border-left: 0;
-                        margin-top: -10px;
-                        margin-right: -20px;
+                        margin-top: -5px;
+                        margin-right: -10px;
                     }
 
                     .ai-bubble {
                         position: relative;
-                        background: #87CEFA;
+                        background: white;
                         border-radius: 1em;
                         color: black;
-                        padding: 10px;
+                        padding: 5px;
                         display: inline-block;
-                        margin: 10px;
-                        margin-bottom: 15px;
+                        margin: 5px;
+                        margin-bottom: 0px;
                         float: left;
                         clear: both;
                     }
@@ -144,16 +144,16 @@ class ChatbotGUI(QWidget):
                     .ai-bubble:after {
                         content: '';
                         position: absolute;
-                        left: 0;
+                        right: 0;
                         top: 50%;
                         width: 0;
                         height: 0;
-                        border: 20px solid transparent;
-                        border-right-color: #f0f0f0;
-                        border-left: 0;
+                        border: 10px solid transparent;
+                        border-left-color: #0084ff;
                         border-right: 0;
-                        margin-top: -10px;
-                        margin-left: -20px;
+                        border-left: 0;
+                        margin-top: -5px;
+                        margin-right: -10px;
                     }
                     .genmessage {
                         position: center;
@@ -240,7 +240,7 @@ class ChatbotGUI(QWidget):
                         background: rwfite;
                     }
                     button {
-                        background: grey;
+                        background: white;
                         border: none;
                         color: white;
                         padding: 10px 20px;
@@ -605,7 +605,8 @@ class ChatbotGUI(QWidget):
             print(chat.last.text)
             if "```" in chat.last.text:
                 parts = chat.last.text.split("```")
-                full_message = "<p style='font-family: Segoe UI; text-align:left;color:black;'>DonutAI : (This is AI generated code and might be wrong, verify it before usage.)</p>"
+                self.append_to_chat_history("<p style='font-family: Segoe UI; text-align:left;color:black;'>🍩 DonutAI :  <i>(Check Code before Use)</i></p>",   False)
+                full_message = ""
                 is_code = False
                 for part in parts:
                     if is_code:
